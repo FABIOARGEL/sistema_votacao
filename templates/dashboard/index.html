@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — VotoDistribuído{% endblock %}
+{% block content %}
+<div class="page">
+<div class="container">
+  <div class="flex-between mb-3" style="flex-wrap:wrap;gap:1rem;">
+    <div>
+      <h1 class="section-title" style="margin-bottom:0.25rem;">📊 Dashboard</h1>
+      <p class="text-muted text-sm">Olá, <strong>{{ current_user.nome }}</strong> — visão geral do sistema</p>
+    </div>
+    <a href="{{ url_for('votacoes.criar') }}" class="btn btn-primary" id="btn-dash-criar">+ Nova Votação</a>
+  </div>
+
+  <!-- Stats globais -->
+  <div class="stats-grid mb-3">
+    <div class="stat-card">
+      <span class="stat-label">Total Votações</span>
+      <span class="stat-value" id="s-votacoes">{{ total_votacoes }}</span>
+      <span class="stat-icon">🗳️</span>
+    </div>
+    <div class="stat-card green">
+      <span class="stat-label">Votos Confirmados</span>
+      <span class="stat-value" id="s-votos">{{ total_votos }}</span>
+      <span class="stat-icon">✅</span>
+    </div>
+    <div class="stat-card blue">
+      <span class="stat-label">Urnas Online</span>
+      <span class="stat-value" id="s-urnas">{{ urnas_online }}</span>
+      <span class="stat-icon">🟢</span>
+    </div>
+    <div class="stat-card yellow">
+      <span class="stat-label">Contadores Online</span>
+      <span class="stat-value" id="s-cont">{{ cont_online }}</span>
+      <span class="stat-icon">🔢</span>
+    </div>
+    <div class="stat-card purple">
+      <span class="stat-label">Usuários</span>
+      <span class="stat-value">{{ total_usuarios }}</span>
+      <span class="stat-icon">👥</span>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- Minhas votações -->
+    <div>
+      <h2 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:var(--text-secondary);">📋 MINHAS VOTAÇÕES</h2>
+      {% if minhas %}
+      <div style="display:flex;flex-direction:column;gap:0.75rem;">
+        {% for v in minhas %}
+        <div class="card" style="padding:1rem 1.25rem;">
+          <div class="flex-between mb-1">
+            <a href="{{ url_for('votacoes.detalhe', vid=v._id|objectid_str) }}" style="font-weight:700;text-decoration:none;color:var(--text-primary);">{{ v.titulo }}</a>
+            <span class="badge {{ 'badge-green' if v.status=='ativa' else 'badge-purple' if v.status=='encerrada' else 'badge-yellow' }}">
+              {{ v.status | fmt_status }}
+            </span>
+          </div>
+          <div style="font-size:0.8rem;color:var(--text-muted);display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:0.75rem;">
+            <span>🗳️ {{ v.qtd_urnas }} urnas</span>
+            <span>🔢 {{ v.qtd_contadores }} contadores</span>
+            <span>📊 {{ v.total_votos or 0 }} votos</span>
+          </div>
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+            <a href="{{ url_for('dashboard.votacao_detail', vid=v._id|objectid_str) }}" class="btn btn-ghost btn-sm">📊 Dashboard</a>
+            <a href="{{ url_for('votacoes.detalhe', vid=v._id|objectid_str) }}" class="btn btn-outline btn-sm">Ver</a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="glass-card text-center" style="padding:2rem;">
+        <div style="font-size:2rem;margin-bottom:0.75rem;">🗳️</div>
+        <p class="text-muted text-sm mb-2">Você ainda não criou votações</p>
+        <a href="{{ url_for('votacoes.criar') }}" class="btn btn-primary btn-sm">Criar primeira votação</a>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Log em tempo real -->
+    <div>
+      <h2 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:var(--text-secondary);">📜 LOGS DO SISTEMA <span class="badge badge-yellow" style="font-size:0.6rem;">⚡ AO VIVO</span></h2>
+      <div class="log-terminal" id="log-global" style="max-height:420px;">
+        {% for l in logs_recentes %}
+        <div class="log-line">
+          <span class="log-badge {{ l.tipo }}">{{ l.tipo }}</span>
+          <span class="log-server">{{ l.servidor_id or 'sistema' }}</span>
+          <span class="log-msg">{{ l.mensagem }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const socket = io();
+socket.on('connect', () => socket.emit('join_dashboard', {}));
+
+socket.on('stats_update', d => {
+  if (d.total_votos !== undefined) document.getElementById('s-votos').textContent = d.total_votos;
+  if (d.urnas_online !== undefined) document.getElementById('s-urnas').textContent = d.urnas_online;
+  if (d.cont_online !== undefined) document.getElementById('s-cont').textContent = d.cont_online;
+});
+
+socket.on('novo_log', data => {
+  const terminal = document.getElementById('log-global');
+  const div = document.createElement('div');
+  div.className = 'log-line';
+  div.innerHTML = `<span class="log-badge ${data.tipo}">${data.tipo}</span>
+    <span class="log-server">${data.servidor||'sistema'}</span>
+    <span class="log-msg">${data.mensagem}</span>`;
+  terminal.insertBefore(div, terminal.firstChild);
+  while (terminal.children.length > 60) terminal.removeChild(terminal.lastChild);
+});
+</script>
+{% endblock %}

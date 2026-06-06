@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Recuperar Senha — VotoDistribuído{% endblock %}
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card fade-in">
+    <h1 class="auth-title">Recuperar senha</h1>
+    <p class="auth-subtitle">Informe seu e-mail e geraremos um link de recuperação</p>
+    <form method="POST">
+      <div class="form-group">
+        <label for="email">E-mail cadastrado</label>
+        <input type="email" id="email" name="email" placeholder="seu@email.com" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full" id="btn-reset-request">Gerar link de recuperação</button>
+    </form>
+    <p class="text-center mt-2" style="font-size:0.875rem; color:var(--text-secondary);">
+      <a href="{{ url_for('auth.login') }}" style="color:var(--blue); text-decoration:none;">← Voltar ao login</a>
+    </p>
+    <div class="alert alert-info mt-2" style="font-size:0.8rem;">
+      ℹ️ <strong>Modo acadêmico:</strong> O link de recuperação será exibido na tela (sem envio de e-mail real).
+    </div>
+  </div>
+</div>
+{% endblock %}

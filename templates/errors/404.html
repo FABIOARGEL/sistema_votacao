@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Página Não Encontrada - VotoDistribuído{% endblock %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center; padding: 2rem;">
+    <h1 style="font-size: 6rem; margin-bottom: 0; color: var(--primary);">404</h1>
+    <h2 style="font-size: 2rem; margin-bottom: 1rem; color: var(--text-primary);">Página Não Encontrada</h2>
+    <p style="color: var(--text-secondary); max-width: 500px; margin-bottom: 2rem;">
+        A página que você está procurando não existe, foi movida ou está temporariamente indisponível.
+    </p>
+    <a href="{{ url_for('index') }}" class="btn btn-primary" style="padding: 0.75rem 1.5rem; font-size: 1rem;">Voltar para o Início</a>
+</div>
+{% endblock %}

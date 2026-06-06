@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Acesso Protegido — VotoDistribuído{% endblock %}
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card fade-in">
+    <div style="font-size:2.5rem;text-align:center;margin-bottom:1rem;">🔒</div>
+    <h1 class="auth-title">Votação Protegida</h1>
+    <p class="auth-subtitle">{{ votacao.titulo }}</p>
+    <p class="text-muted text-sm text-center mb-3">Esta votação é privada. Informe a senha para acessar.</p>
+    <form method="POST">
+      <div class="form-group">
+        <label for="senha">Senha de acesso</label>
+        <input type="password" id="senha" name="senha" placeholder="••••••••" required autofocus>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full" id="btn-acessar">Acessar votação</button>
+    </form>
+    <p class="text-center mt-2">
+      <a href="{{ url_for('votacoes.lista') }}" style="color:var(--text-muted);text-decoration:none;font-size:0.875rem;">← Voltar às votações</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

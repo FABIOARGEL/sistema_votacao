@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Nova Senha — VotoDistribuído{% endblock %}
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card fade-in">
+    <h1 class="auth-title">Nova senha</h1>
+    <p class="auth-subtitle">Defina sua nova senha de acesso</p>
+    <form method="POST">
+      <div class="form-group">
+        <label for="senha">Nova senha</label>
+        <input type="password" id="senha" name="senha" placeholder="Mín. 6 caracteres" required minlength="6">
+      </div>
+      <button type="submit" class="btn btn-primary btn-full" id="btn-reset-senha">Salvar nova senha</button>
+    </form>
+    <p class="text-center mt-2" style="font-size:0.875rem;">
+      <a href="{{ url_for('auth.login') }}" style="color:var(--blue); text-decoration:none;">← Voltar ao login</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

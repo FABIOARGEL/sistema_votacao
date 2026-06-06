@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Meu Perfil — VotoDistribuído{% endblock %}
+{% block content %}
+<div class="page">
+<div class="container-sm">
+  <h1 class="section-title">👤 Meu Perfil</h1>
+  <div class="card fade-in">
+    <div class="card-body">
+      <!-- Avatar -->
+      <div class="text-center mb-3">
+        <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;margin:0 auto 1rem;">
+          {% if user.foto %}<img src="{{ user.foto }}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">
+          {% else %}{{ user.nome[0].upper() }}{% endif %}
+        </div>
+        <h2 style="font-size:1.25rem;font-weight:700;">{{ user.nome }}</h2>
+        <p class="text-muted text-sm">{{ user.email }}</p>
+        {% if user.google_id %}
+          <span class="badge badge-blue mt-1">Google</span>
+        {% endif %}
+        <p class="text-muted text-sm mt-1">Membro desde {{ user.criado_em | fmt_dt }}</p>
+      </div>
+      <div class="divider"></div>
+      <form method="POST">
+        <div class="form-group">
+          <label for="nome">Nome de exibição</label>
+          <input type="text" id="nome" name="nome" value="{{ user.nome }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary" id="btn-salvar-perfil">💾 Salvar alterações</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Ações rápidas -->
+  <div class="card mt-2">
+    <div class="card-header"><span class="card-title">Ações</span></div>
+    <div class="card-body" style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+      <a href="{{ url_for('votacoes.lista') }}" class="btn btn-ghost">🗳️ Ver votações</a>
+      <a href="{{ url_for('dashboard.index') }}" class="btn btn-ghost">📊 Dashboard</a>
+      <a href="{{ url_for('votacoes.criar') }}" class="btn btn-outline">+ Criar votação</a>
+      <a href="{{ url_for('auth.logout') }}" class="btn btn-danger">🚪 Sair</a>
+    </div>
+  </div>
+</div>
+</div>
+{% endblock %}

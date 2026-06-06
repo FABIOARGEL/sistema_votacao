@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+{% block title %}{{ votacao.titulo }} — VotoDistribuído{% endblock %}
+{% block content %}
+<div class="page">
+<div class="container">
+
+  <!-- Cabeçalho -->
+  <div class="flex-between mb-3" style="flex-wrap:wrap;gap:1rem;align-items:flex-start;">
+    <div>
+      <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.5rem;flex-wrap:wrap;">
+        <span class="badge {{ 'badge-green' if votacao.status=='ativa' else 'badge-purple' if votacao.status=='encerrada' else 'badge-yellow' }}">
+          {{ votacao.status | fmt_status }}
+        </span>
+        {% if not votacao.publica %}<span class="badge badge-red">🔒 Privada</span>{% endif %}
+        {% if is_criador %}<span class="badge badge-blue">Criador</span>{% endif %}
+      </div>
+      <h1 style="font-size:1.75rem;font-weight:800;margin-bottom:0.25rem;">{{ votacao.titulo }}</h1>
+      {% if votacao.descricao %}<p class="text-muted">{{ votacao.descricao }}</p>{% endif %}
+      <div style="display:flex;gap:1.5rem;flex-wrap:wrap;margin-top:0.5rem;font-size:0.8rem;color:var(--text-muted);">
+        {% if votacao.inicio %}<span>▶️ {{ votacao.inicio | fmt_dt }}</span>{% endif %}
+        {% if votacao.fim %}<span>⏹️ {{ votacao.fim | fmt_dt }}</span>{% endif %}
+        <span>📊 {{ total_votos }} votos</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+      {% if votacao.status == 'ativa' and current_user.is_authenticated and not ja_votou %}
+        <a href="{{ url_for('votacoes.votar', vid=votacao._id|objectid_str) }}" class="btn btn-primary btn-lg" id="btn-votar-agora">
+          🗳️ Votar Agora
+        </a>
+      {% endif %}
+      {% if is_criador %}
+        <a href="{{ url_for('dashboard.votacao_detail', vid=votacao._id|objectid_str) }}" class="btn btn-ghost">📊 Dashboard</a>
+        {% if votacao.status == 'ativa' %}
+        <form method="POST" action="{{ url_for('votacoes.encerrar', vid=votacao._id|objectid_str) }}" style="display:inline;" onsubmit="return confirm('Encerrar votação?')">
+          <button type="submit" class="btn btn-danger" id="btn-encerrar-votacao">⏹️ Encerrar</button>
+        </form>
+        {% endif %}
+      {% endif %}
+      <a href="{{ url_for('votacoes.lista') }}" class="btn btn-ghost">← Voltar</a>
+    </div>
+  </div>
+
+  <div class="grid-2" style="gap:1.5rem;">
+
+    <!-- Coluna principal -->
+    <div style="display:flex;flex-direction:column;gap:1.5rem;">
+
+      <!-- Resultado / votação -->
+      {% if ja_votou %}
+      <div class="alert alert-success">✅ Você já votou nesta eleição. Acompanhe os resultados abaixo.</div>
+      {% elif not current_user.is_authenticated %}
+      <div class="alert alert-info">ℹ️ <a href="{{ url_for('auth.login') }}" style="color:inherit;font-weight:600;">Faça login</a> para participar desta votação.</div>
+      {% elif votacao.status != 'ativa' %}
+      <div class="alert alert-warning">⚠️ Esta votação não está ativa.</div>
+      {% endif %}
+
+      <!-- Candidatos e resultados -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🎯 Candidatos & Resultados</span>
+          <span class="text-muted text-sm" id="total-votos-display">{{ total_votos }} votos</span>
+        </div>
+        <div class="card-body" id="resultados-container">
+          {% for item in contagem_display %}
+          <div class="resultado-bar" id="res-{{ loop.index }}">
+            <div class="resultado-bar-header">
+              <span class="resultado-nome">
+                <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:50%;font-size:0.75rem;font-weight:800;margin-right:0.5rem;">{{ item.candidato.numero }}</span>
+                {{ item.candidato.nome }}
+              </span>
+              <div style="text-align:right;">
+                <span style="font-weight:700;font-size:1rem;">{{ item.votos }}</span>
+                <span class="text-muted text-sm"> votos</span>
+                <span class="badge badge-blue" style="margin-left:0.25rem;">{{ item.pct }}%</span>
+              </div>
+            </div>
+            {% if item.candidato.descricao %}
+            <p class="text-muted text-sm mb-1">{{ item.candidato.descricao }}</p>
+            {% endif %}
+            <div class="resultado-track">
+              <div class="resultado-fill" style="width:{{ item.pct }}%;"
+                   data-candidato="{{ item.candidato._id|objectid_str }}"
+                   data-pct="{{ item.pct }}"></div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Coluna lateral — infraestrutura -->
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+
+      <!-- Status urnas -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🗳️ Servidores de Urna</span>
+          <span class="badge badge-green" id="badge-urnas-online">{{ urnas | selectattr('status','eq','online') | list | length }} online</span>
+        </div>
+        <div class="card-body">
+          <div class="server-grid" id="grid-urnas">
+            {% for u in urnas %}
+            <div class="server-card {{ u.status }}" id="urna-{{ u.porta }}">
+              <div class="server-dot {{ u.status }}"></div>
+              <div class="server-name">Urna</div>
+              <div class="server-port">:{{ u.porta }}</div>
+              <div class="server-votes">{{ u.votos_recebidos or 0 }}</div>
+              <div style="font-size:0.65rem;color:var(--text-muted);">votos</div>
+            </div>
+            {% else %}
+            <p class="text-muted text-sm">Infraestrutura inicializando...</p>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Status contadores -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🔢 Servidores de Contagem</span>
+          <span class="badge badge-blue" id="badge-cont-online">{{ contadores | selectattr('status','eq','online') | list | length }} online</span>
+        </div>
+        <div class="card-body">
+          <div class="server-grid" id="grid-contadores">
+            {% for c in contadores %}
+            <div class="server-card {{ c.status }}" id="cont-{{ c.porta }}" style="border-color:{% if c.status=='online' %}var(--green){% elif c.status=='offline' %}var(--red){% else %}var(--yellow){% endif %};">
+              <div class="server-dot {{ c.status }}"></div>
+              <div class="server-name">Contador</div>
+              <div class="server-port">:{{ c.porta }}</div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Logs em tempo real -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📜 Logs em Tempo Real</span>
+          <span class="badge badge-yellow" id="badge-live">⚡ AO VIVO</span>
+        </div>
+        <div class="card-body" style="padding:0.5rem;">
+          <div class="log-terminal" id="log-terminal">
+            {% for l in logs %}
+            <div class="log-line">
+              <span class="log-badge {{ l.tipo }}">{{ l.tipo }}</span>
+              <span class="log-server">{{ l.servidor_id or 'sistema' }}</span>
+              <span class="log-msg">{{ l.mensagem }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const VOTACAO_ID = "{{ votacao._id | objectid_str }}";
+const socket = io();
+let chart = null;
+
+socket.on('connect', () => {
+  socket.emit('join_votacao', { votacao_id: VOTACAO_ID });
+});
+
+// Novos logs
+socket.on('novo_log', data => {
+  if (data.votacao_id !== VOTACAO_ID) return;
+  const terminal = document.getElementById('log-terminal');
+  const div = document.createElement('div');
+  div.className = 'log-line';
+  div.innerHTML = `
+    <span class="log-badge ${data.tipo}">${data.tipo}</span>
+    <span class="log-server">${data.servidor || 'sistema'}</span>
+    <span class="log-msg">${data.mensagem}</span>
+  `;
+  terminal.insertBefore(div, terminal.firstChild);
+  while (terminal.children.length > 50) terminal.removeChild(terminal.lastChild);
+});
+
+// Atualização de resultado
+socket.on('resultado_update', data => {
+  if (data.votacao_id !== VOTACAO_ID) return;
+  document.getElementById('total-votos-display').textContent = `${data.total_votos} votos`;
+  const total = data.total_votos || 1;
+  data.resultado.forEach(r => {
+    document.querySelectorAll('.resultado-fill').forEach(fill => {
+      const parent = fill.closest('.resultado-bar');
+      const nome = parent?.querySelector('.resultado-nome')?.textContent?.trim();
+      if (nome && nome.includes(r.nome)) {
+        fill.style.width = r.pct + '%';
+        const badge = parent.querySelector('.badge-blue');
+        if (badge) badge.textContent = r.pct + '%';
+        const vSpan = parent.querySelector('.resultado-bar-header [style*="font-weight:700"]');
+        if (vSpan) vSpan.textContent = r.votos;
+      }
+    });
+  });
+});
+
+// Status de servidor
+socket.on('status_servidor', data => {
+  if (data.votacao_id !== VOTACAO_ID) return;
+  const el = document.getElementById(`${data.tipo}-${data.porta}`);
+  if (el) {
+    el.className = `server-card ${data.status}`;
+    const dot = el.querySelector('.server-dot');
+    if (dot) dot.className = `server-dot ${data.status}`;
+  }
+});
+
+// Polling de status a cada 5s
+setInterval(async () => {
+  try {
+    const r = await fetch(`/api/votacoes/${VOTACAO_ID}/status`);
+    const d = await r.json();
+    if (d.urnas) {
+      let onlineU = 0;
+      d.urnas.forEach(u => {
+        const el = document.getElementById(`urna-${u.porta}`);
+        if (el) {
+          el.className = `server-card ${u.status}`;
+          el.querySelector('.server-dot').className = `server-dot ${u.status}`;
+          const v = el.querySelector('.server-votes');
+          if (v) v.textContent = u.votos_recebidos || 0;
+        }
+        if (u.status === 'online') onlineU++;
+      });
+      const bu = document.getElementById('badge-urnas-online');
+      if (bu) bu.textContent = `${onlineU} online`;
+    }
+    if (d.contadores) {
+      let onlineC = 0;
+      d.contadores.forEach(c => {
+        const el = document.getElementById(`cont-${c.porta}`);
+        if (el) {
+          el.className = `server-card ${c.status}`;
+          el.querySelector('.server-dot').className = `server-dot ${c.status}`;
+        }
+        if (c.status === 'online') onlineC++;
+      });
+      const bc = document.getElementById('badge-cont-online');
+      if (bc) bc.textContent = `${onlineC} online`;
+    }
+  } catch(e) {}
+}, 5000);
+</script>
+{% endblock %}

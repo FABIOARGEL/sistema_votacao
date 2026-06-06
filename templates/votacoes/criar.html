@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% block title %}Criar Votação — VotoDistribuído{% endblock %}
+{% block content %}
+<div class="page">
+<div class="container-md">
+  <h1 class="section-title">⚙️ Nova Votação Distribuída</h1>
+  <p class="section-subtitle">Configure a infraestrutura distribuída da sua votação</p>
+
+  <form method="POST" action="{{ url_for('votacoes.criar') }}" id="form-criar-votacao">
+    <div class="grid-2">
+
+      <!-- Coluna Esquerda -->
+      <div style="display:flex;flex-direction:column;gap:1rem;">
+
+        <!-- Informações básicas -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">📋 Informações Básicas</span></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label for="titulo">Título da votação *</label>
+              <input type="text" id="titulo" name="titulo" placeholder="Ex: Eleição do Centro Acadêmico" required maxlength="120">
+            </div>
+            <div class="form-group">
+              <label for="descricao">Descrição</label>
+              <textarea id="descricao" name="descricao" placeholder="Descreva o objetivo desta votação..." rows="3"></textarea>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label for="inicio">Início</label>
+                <input type="datetime-local" id="inicio" name="inicio">
+              </div>
+              <div class="form-group">
+                <label for="fim">Término</label>
+                <input type="datetime-local" id="fim" name="fim">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Acesso -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">🔒 Controle de Acesso</span></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-check">
+                <input type="checkbox" name="publica" id="publica" checked>
+                <span>Votação pública (visível a todos)</span>
+              </label>
+            </div>
+            <div class="form-group">
+              <label for="senha_acesso">Senha de acesso (opcional)</label>
+              <input type="text" id="senha_acesso" name="senha_acesso" placeholder="Deixe vazio para sem senha">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Coluna Direita -->
+      <div style="display:flex;flex-direction:column;gap:1rem;">
+
+        <!-- Infraestrutura distribuída -->
+        <div class="card" style="border-color:var(--blue);box-shadow:0 0 20px var(--blue-glow);">
+          <div class="card-header" style="background:var(--blue-glow);">
+            <span class="card-title">🏗️ Infraestrutura Distribuída</span>
+            <span class="badge badge-blue">Auto-gerada</span>
+          </div>
+          <div class="card-body">
+            <p class="text-muted text-sm mb-2">O sistema criará automaticamente processos independentes para esta votação.</p>
+
+            <div class="form-group">
+              <label for="qtd_urnas">🗳️ Quantidade de Urnas</label>
+              <input type="number" id="qtd_urnas" name="qtd_urnas" value="2" min="1" max="10" oninput="atualizarTopologia()">
+              <span class="text-muted text-sm">Cada urna é um processo TCP independente</span>
+            </div>
+            <div class="form-group">
+              <label for="qtd_contadores">🔢 Quantidade de Contadores</label>
+              <input type="number" id="qtd_contadores" name="qtd_contadores" value="2" min="1" max="5" oninput="atualizarTopologia()">
+              <span class="text-muted text-sm">Contadores replicam votos entre si</span>
+            </div>
+
+            <!-- Preview topologia -->
+            <div style="background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-md);padding:1rem;margin-top:0.5rem;">
+              <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.75rem;font-weight:600;text-transform:uppercase;">Preview da Infraestrutura</div>
+              <div class="topology" id="topo-preview" style="padding:0.5rem;gap:0.5rem;">
+                <!-- Gerado por JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Info SD -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">ℹ️ Como funciona</span></div>
+          <div class="card-body" style="font-size:0.8rem;color:var(--text-secondary);display:flex;flex-direction:column;gap:0.5rem;">
+            <div>🧭 <strong>Coordenador</strong> — gerencia toda a infraestrutura</div>
+            <div>🗳️ <strong>Urnas</strong> — recebem votos, balanceamento round-robin</div>
+            <div>🔢 <strong>Contadores</strong> — replicam resultados entre si</div>
+            <div>💓 <strong>Heartbeat</strong> — detecção automática de falhas a cada 5s</div>
+            <div>🔄 <strong>Replicação</strong> — Eleitor → Urna → Contador → Réplicas</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Candidatos -->
+    <div class="card mt-2">
+      <div class="card-header">
+        <span class="card-title">🎯 Candidatos / Opções de Voto</span>
+        <button type="button" class="btn btn-outline btn-sm" onclick="addCandidato()" id="btn-add-candidato">+ Adicionar</button>
+      </div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:70px 1fr 2fr auto;gap:0.5rem;margin-bottom:0.5rem;padding:0 0.25rem;">
+          <span class="text-muted text-sm" style="font-weight:600;">Nº</span>
+          <span class="text-muted text-sm" style="font-weight:600;">Nome *</span>
+          <span class="text-muted text-sm" style="font-weight:600;">Descrição</span>
+          <span></span>
+        </div>
+        <div id="candidatos-container">
+          <!-- Candidatos iniciais inseridos por JS -->
+        </div>
+        <p class="text-muted text-sm mt-1">Mínimo 2 candidatos/opções obrigatório.</p>
+      </div>
+    </div>
+
+    <div class="flex-between mt-3" style="flex-wrap:wrap;gap:1rem;">
+      <a href="{{ url_for('votacoes.lista') }}" class="btn btn-ghost">← Cancelar</a>
+      <button type="submit" class="btn btn-primary btn-lg" id="btn-criar-votacao">
+        🚀 Criar Votação e Infraestrutura
+      </button>
+    </div>
+  </form>
+</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let contCand = 0;
+
+function addCandidato(nome='', numero='', desc='') {
+  contCand++;
+  const n = numero || contCand;
+  const container = document.getElementById('candidatos-container');
+  const div = document.createElement('div');
+  div.className = 'candidato-form-item';
+  div.id = `cand-${contCand}`;
+  div.innerHTML = `
+    <input type="number" name="candidato_numero[]" value="${n}" min="1" placeholder="Nº" style="text-align:center;">
+    <input type="text" name="candidato_nome[]" value="${nome}" placeholder="Nome do candidato" required>
+    <input type="text" name="candidato_desc[]" value="${desc}" placeholder="Descrição opcional">
+    <button type="button" onclick="this.closest('.candidato-form-item').remove();atualizarTopologia();"
+      class="btn btn-danger btn-sm" style="padding:0.4rem 0.6rem;">✕</button>
+  `;
+  container.appendChild(div);
+  atualizarTopologia();
+}
+
+function atualizarTopologia() {
+  const urnas = Math.max(1, parseInt(document.getElementById('qtd_urnas').value)||1);
+  const conts = Math.max(1, parseInt(document.getElementById('qtd_contadores').value)||1);
+  const preview = document.getElementById('topo-preview');
+
+  let html = `<div class="server-card online" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.4rem 0.8rem;">
+    <span class="server-dot online"></span><span style="font-size:0.75rem;font-weight:700;">🧭 Coordenador</span>
+  </div>
+  <div class="topo-line"></div>
+  <div class="topology-row">`;
+  for (let i=0;i<urnas;i++) html += `<div class="server-card online" style="min-width:80px;padding:0.5rem;">
+    <div class="server-dot online"></div><div class="server-name" style="font-size:0.7rem;">Urna ${i+1}</div></div>`;
+  html += `</div><div class="topo-line"></div><div class="topology-row">`;
+  for (let i=0;i<conts;i++) html += `<div class="server-card online" style="min-width:90px;padding:0.5rem;border-color:var(--green);">
+    <div class="server-dot online"></div><div class="server-name" style="font-size:0.7rem;">Contador ${i+1}</div></div>`;
+  html += `</div><div style="font-size:0.7rem;color:var(--text-muted);margin-top:0.5rem;">
+    Total: ${1 + urnas + conts} processos independentes</div>`;
+  preview.innerHTML = html;
+}
+
+// Inicializar
+addCandidato('Candidato A','1','');
+addCandidato('Candidato B','2','');
+atualizarTopologia();
+
+// Confirmar envio
+document.getElementById('form-criar-votacao').addEventListener('submit', function(e) {
+  const btn = document.getElementById('btn-criar-votacao');
+  btn.innerHTML = '<div class="spinner"></div> Criando infraestrutura...';
+  btn.disabled = true;
+});
+</script>
+{% endblock %}

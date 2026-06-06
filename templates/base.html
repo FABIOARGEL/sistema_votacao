@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}VotoDistribuído{% endblock %}</title>
+  <meta name="description" content="{% block meta_desc %}Plataforma acadêmica de votação distribuída com Flask, MongoDB e Socket.IO{% endblock %}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  {% block head_extra %}{% endblock %}
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="{{ url_for('index') }}" class="navbar-brand">
+    <div class="logo-icon">🗳️</div>
+    <span>VotoDistribuído</span>
+  </a>
+
+  <ul class="navbar-nav">
+    <li><a href="{{ url_for('votacoes.lista') }}" class="nav-link">Votações</a></li>
+    {% if current_user.is_authenticated %}
+    <li><a href="{{ url_for('dashboard.index') }}" class="nav-link">Dashboard</a></li>
+    <li><a href="{{ url_for('votacoes.criar') }}" class="nav-link">+ Criar</a></li>
+    {% endif %}
+  </ul>
+
+  <div class="navbar-actions">
+    {% if current_user.is_authenticated %}
+      <div style="position:relative;" id="user-menu-wrap">
+        <div class="nav-avatar" onclick="toggleUserMenu()" title="{{ current_user.nome }}">
+          {% if current_user.foto %}
+            <img src="{{ current_user.foto }}" alt="foto">
+          {% else %}
+            {{ current_user.nome[0].upper() }}
+          {% endif %}
+        </div>
+        <div id="user-dropdown" style="display:none; position:absolute; right:0; top:calc(100% + 8px);
+             background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-md);
+             padding:0.5rem; min-width:180px; box-shadow:var(--shadow); z-index:200;">
+          <div style="padding:0.5rem 0.75rem; font-size:0.8rem; color:var(--text-secondary); border-bottom:1px solid var(--border); margin-bottom:0.25rem;">
+            {{ current_user.email }}
+          </div>
+          <a href="{{ url_for('auth.profile') }}" style="display:block; padding:0.5rem 0.75rem; color:var(--text-primary); text-decoration:none; border-radius:6px; font-size:0.875rem;" onmouseover="this.style.background='var(--bg-glass)'" onmouseout="this.style.background=''">👤 Perfil</a>
+          <a href="{{ url_for('dashboard.index') }}" style="display:block; padding:0.5rem 0.75rem; color:var(--text-primary); text-decoration:none; border-radius:6px; font-size:0.875rem;" onmouseover="this.style.background='var(--bg-glass)'" onmouseout="this.style.background=''">📊 Dashboard</a>
+          <div style="border-top:1px solid var(--border); margin-top:0.25rem; padding-top:0.25rem;">
+            <a href="{{ url_for('auth.logout') }}" style="display:block; padding:0.5rem 0.75rem; color:var(--red); text-decoration:none; border-radius:6px; font-size:0.875rem;" onmouseover="this.style.background='var(--red-glow)'" onmouseout="this.style.background=''">🚪 Sair</a>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <a href="{{ url_for('auth.login') }}" class="btn btn-ghost btn-sm">Entrar</a>
+      <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm">Cadastrar</a>
+    {% endif %}
+  </div>
+</nav>
+
+<!-- FLASH MESSAGES -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div style="position:fixed; top:72px; right:1.5rem; z-index:500; display:flex; flex-direction:column; gap:0.5rem; max-width:420px;">
+      {% for cat, msg in messages %}
+        <div class="alert alert-{{ cat }}" id="flash-{{ loop.index }}" style="cursor:pointer;" onclick="this.remove()">
+          <span>{{ '✅' if cat=='success' else '❌' if cat=='danger' else 'ℹ️' if cat=='info' else '⚠️' }}</span>
+          <span>{{ msg }}</span>
+        </div>
+      {% endfor %}
+    </div>
+    <script>
+      setTimeout(() => document.querySelectorAll('[id^="flash-"]').forEach(e=>e.remove()), 6000);
+    </script>
+  {% endif %}
+{% endwith %}
+
+<!-- CONTEÚDO PRINCIPAL -->
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<!-- FOOTER -->
+<footer style="border-top:1px solid var(--border); padding:1.5rem; text-align:center; color:var(--text-muted); font-size:0.8rem; margin-top:4rem;">
+  <span>VotoDistribuído &copy; 2024 — Projeto Acadêmico · Sistemas Distribuídos</span>
+  <span style="margin:0 0.75rem;">·</span>
+  <span>Flask · MongoDB · Socket.IO · TCP Sockets</span>
+</footer>
+
+<script>
+function toggleUserMenu() {
+  const d = document.getElementById('user-dropdown');
+  d.style.display = d.style.display === 'none' ? 'block' : 'none';
+}
+document.addEventListener('click', e => {
+  if (!document.getElementById('user-menu-wrap')?.contains(e.target)) {
+    const d = document.getElementById('user-dropdown');
+    if (d) d.style.display = 'none';
+  }
+});
+</script>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

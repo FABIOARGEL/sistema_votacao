@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Votar — {{ votacao.titulo }}{% endblock %}
+{% block content %}
+<div class="page">
+<div class="container-md">
+  <a href="{{ url_for('votacoes.detalhe', vid=votacao._id|objectid_str) }}" style="color:var(--text-muted);text-decoration:none;font-size:0.875rem;display:inline-block;margin-bottom:1rem;">← Voltar</a>
+
+  <h1 class="section-title">🗳️ {{ votacao.titulo }}</h1>
+  {% if votacao.descricao %}<p class="section-subtitle">{{ votacao.descricao }}</p>{% endif %}
+
+  <div class="alert alert-info mb-3">
+    ℹ️ Selecione um candidato e confirme seu voto. Esta ação é <strong>irreversível</strong>.
+    Seu voto será enviado a uma urna via TCP e replicado aos contadores.
+  </div>
+
+  <form method="POST" action="{{ url_for('votacoes.votar', vid=votacao._id|objectid_str) }}" id="form-votar">
+    <div class="candidatos-grid" id="grid-candidatos">
+      {% for c in candidatos %}
+      <label class="candidato-card" for="cand-{{ c._id|objectid_str }}" id="label-{{ c._id|objectid_str }}"
+             onclick="selecionarCandidato('{{ c._id|objectid_str }}')">
+        <input type="radio" name="candidato_id" id="cand-{{ c._id|objectid_str }}"
+               value="{{ c._id|objectid_str }}" required>
+        <div class="candidato-check">✓</div>
+        <div class="candidato-numero">{{ c.numero }}</div>
+        <div class="candidato-nome">{{ c.nome }}</div>
+        {% if c.descricao %}<div class="candidato-desc">{{ c.descricao }}</div>{% endif %}
+      </label>
+      {% endfor %}
+    </div>
+
+    <!-- Info distribuída -->
+    <div class="card mt-3" style="border-color:rgba(79,142,247,0.3);">
+      <div class="card-body" style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+        <div style="flex:1;">
+          <div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;margin-bottom:0.25rem;">Fluxo do voto</div>
+          <div style="font-family:monospace;font-size:0.8rem;color:var(--text-primary);">
+            Você → app.py → Coordenador → <span style="color:var(--blue)">Urna (round-robin)</span> → <span style="color:var(--green)">Contadores</span>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg" id="btn-confirmar-voto" disabled>
+          ✅ Confirmar Voto
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function selecionarCandidato(id) {
+  document.querySelectorAll('.candidato-card').forEach(el => el.classList.remove('selecionado'));
+  document.getElementById('label-' + id).classList.add('selecionado');
+  document.getElementById('btn-confirmar-voto').disabled = false;
+}
+
+document.getElementById('form-votar').addEventListener('submit', function(e) {
+  const btn = document.getElementById('btn-confirmar-voto');
+  btn.innerHTML = '<div class="spinner"></div> Enviando à urna...';
+  btn.disabled = true;
+});
+</script>
+{% endblock %}
