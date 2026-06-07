@@ -126,64 +126,10 @@ def criar():
                            f"urnas={portas['urnas']}, contadores={portas['contadores']}")
 
         flash(f"Votação criada! Infraestrutura distribuída sendo inicializada...", "success")
-        return redirect(url_for("votacoes.detalhe", vid=votacao_id_str))
+        return redirect(url_for("votacoes.votar", vid=votacao_id_str))
 
     return render_template("votacoes/criar.html")
 
-
-# ---------------------------------------------------------------------------
-# Detalhe de votação
-# ---------------------------------------------------------------------------
-@votacoes_bp.route("/votacoes/<vid>")
-def detalhe(vid: str):
-    votacao = VotacaoModel.por_id(vid)
-    if not votacao:
-        flash("Votação não encontrada.", "danger")
-        return redirect(url_for("votacoes.lista"))
-
-    # Senha? Verificar na sessão
-    if votacao.get("senha") and not current_user.is_authenticated:
-        if session.get(f"acesso_votacao_{vid}") != "ok":
-            return redirect(url_for("votacoes.entrar", vid=vid))
-
-    candidatos    = CandidatoModel.por_votacao(vid)
-    urnas         = ServidorModel.urnas_por_votacao(vid)
-    contadores    = ServidorModel.contadores_por_votacao(vid)
-    logs          = LogModel.recentes(vid, 20)
-    ja_votou      = False
-    contagem      = {}
-
-    if current_user.is_authenticated:
-        ja_votou = VotoModel.eleitor_ja_votou(vid, current_user.id)
-        contagem = VotoModel.contagem_por_candidato(vid)
-
-    # Montar contagem com nomes
-    contagem_display = []
-    total = sum(contagem.values()) or 1
-    for c in candidatos:
-        cid = str(c["_id"])
-        votos = contagem.get(cid, 0)
-        contagem_display.append({
-            "candidato": c,
-            "votos":     votos,
-            "pct":       round(votos / total * 100, 1),
-        })
-
-    is_criador = (current_user.is_authenticated and
-                  str(votacao.get("criador_id")) == current_user.id)
-
-    return render_template(
-        "votacoes/detalhe.html",
-        votacao=votacao,
-        candidatos=candidatos,
-        urnas=urnas,
-        contadores=contadores,
-        logs=logs,
-        ja_votou=ja_votou,
-        contagem_display=contagem_display,
-        total_votos=votacao.get("total_votos", 0),
-        is_criador=is_criador,
-    )
 
 
 # ---------------------------------------------------------------------------
@@ -199,60 +145,113 @@ def entrar(vid: str):
         senha_inf = request.form.get("senha", "")
         if senha_inf == votacao.get("senha"):
             session[f"acesso_votacao_{vid}"] = "ok"
-            return redirect(url_for("votacoes.detalhe", vid=vid))
+            return redirect(url_for("votacoes.votar", vid=vid))
         flash("Senha incorreta.", "danger")
 
     return render_template("votacoes/entrar.html", votacao=votacao)
 
 
 # ---------------------------------------------------------------------------
-# Votar
+# Votar e Ver Resultados
 # ---------------------------------------------------------------------------
+@votacoes_bp.route("/votacoes/<vid>/resultados", methods=["GET"])
+def resultados(vid: str):
+    return votar(vid)
+
 @votacoes_bp.route("/votacoes/<vid>/votar", methods=["GET", "POST"])
-@login_required
 def votar(vid: str):
     votacao = VotacaoModel.por_id(vid)
     if not votacao:
         flash("Votação não encontrada.", "danger")
         return redirect(url_for("votacoes.lista"))
 
-    if votacao.get("status") != "ativa":
-        flash("Esta votação não está ativa.", "warning")
-        return redirect(url_for("votacoes.detalhe", vid=vid))
-
-    if VotoModel.eleitor_ja_votou(vid, current_user.id):
-        flash("Você já votou nesta votação.", "info")
-        return redirect(url_for("votacoes.detalhe", vid=vid))
+    # Verifica senha antes de qualquer coisa, se não estiver logado
+    if votacao.get("senha") and not current_user.is_authenticated:
+        if session.get(f"acesso_votacao_{vid}") != "ok":
+            return redirect(url_for("votacoes.entrar", vid=vid))
 
     candidatos = CandidatoModel.por_votacao(vid)
+    ja_votou = False
+    
+    # Se está autenticado, verifica se já votou
+    if current_user.is_authenticated:
+        ja_votou = VotoModel.eleitor_ja_votou(vid, current_user.id)
 
+    # Preparar variáveis para resultados caso precise mostrá-los
+    mostrar_resultados = ja_votou or votacao.get("status") != "ativa"
+    
+    # Redirecionamento semântico
+    if request.method == "GET":
+        if mostrar_resultados and request.path.endswith('/votar'):
+            return redirect(f"/votacoes/{vid}/resultados")
+        elif not mostrar_resultados and request.path.endswith('/resultados'):
+            return redirect(f"/votacoes/{vid}/votar")
+    contagem_display = []
+    
+    if mostrar_resultados:
+        contagem = VotoModel.contagem_por_candidato(vid)
+        total = sum(contagem.values()) or 1
+        for c in candidatos:
+            cid = str(c["_id"])
+            votos = contagem.get(cid, 0)
+            contagem_display.append({
+                "candidato": c,
+                "votos":     votos,
+                "pct":       round(votos / total * 100, 1),
+            })
+            
+    is_criador = (current_user.is_authenticated and
+                  str(votacao.get("criador_id")) == current_user.id)
+
+    # Somente permite POST se for para votar, e usuário autenticado, votacao ativa, e nao votou
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            flash("Faça login para votar.", "danger")
+            return redirect(url_for("auth.login"))
+            
+        if votacao.get("status") != "ativa":
+            flash("Esta votação não está ativa.", "warning")
+            return redirect(f"/votacoes/{vid}/resultados")
+
+        if ja_votou:
+            flash("Você já votou nesta votação.", "info")
+            return redirect(f"/votacoes/{vid}/resultados")
+
         candidato_id = request.form.get("candidato_id")
         if not candidato_id:
             flash("Selecione um candidato.", "danger")
-            return render_template("votacoes/votar.html", votacao=votacao, candidatos=candidatos)
+            return render_template("votacoes/votar.html", votacao=votacao, candidatos=candidatos, mostrar_resultados=False, is_criador=is_criador)
 
         porta_coord = votacao.get("porta_coordenador")
         if not porta_coord:
             flash("Infraestrutura da votação não disponível.", "danger")
-            return redirect(url_for("votacoes.detalhe", vid=vid))
+            return redirect(url_for("dashboard.votacao_detail", vid=vid) if is_criador else url_for("votacoes.lista"))
 
         # Obter urna balanceada
         porta_urna = obter_urna(porta_coord)
         if not porta_urna:
             flash("Nenhuma urna disponível no momento. Tente novamente.", "danger")
-            return render_template("votacoes/votar.html", votacao=votacao, candidatos=candidatos)
+            return render_template("votacoes/votar.html", votacao=votacao, candidatos=candidatos, mostrar_resultados=False, is_criador=is_criador)
 
         # Enviar voto
         resp = enviar_voto(porta_urna, vid, current_user.id, candidato_id)
 
         if resp.get("status") == "ok":
-            flash(" Voto registrado com sucesso!", "success")
+            flash("Voto registrado com sucesso!", "success")
             return redirect(url_for("votacoes.confirmacao", vid=vid, voto_id=resp.get("voto_id", "")))
         else:
             flash(f"Erro ao votar: {resp.get('motivo', 'Falha desconhecida')}", "danger")
 
-    return render_template("votacoes/votar.html", votacao=votacao, candidatos=candidatos)
+    return render_template(
+        "votacoes/votar.html", 
+        votacao=votacao, 
+        candidatos=candidatos, 
+        mostrar_resultados=mostrar_resultados,
+        contagem_display=contagem_display,
+        ja_votou=ja_votou,
+        total_votos=votacao.get("total_votos", 0),
+        is_criador=is_criador
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -289,7 +288,7 @@ def encerrar(vid: str):
     VotacaoModel.encerrar(vid, resultado)
 
     flash("Votação encerrada com sucesso.", "success")
-    return redirect(url_for("votacoes.detalhe", vid=vid))
+    return redirect(url_for("dashboard.votacao_detail", vid=vid))
 
 
 # ---------------------------------------------------------------------------

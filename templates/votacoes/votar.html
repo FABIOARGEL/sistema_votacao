@@ -6,18 +6,85 @@
   <div class="container-md" style="max-width: 760px; margin: 0 auto;">
     
     <!-- Voltar link -->
-    <a href="{{ url_for('votacoes.detalhe', vid=votacao._id|objectid_str) }}" style="color: var(--text-muted); font-size: 0.875rem; display: inline-flex; align-items: center; gap: 0.375rem; margin-bottom: 1.5rem; transition: var(--transition);" onhover="this.style.color='var(--text-primary)'">
+    <a href="{% if is_criador %}{{ url_for('dashboard.votacao_detail', vid=votacao._id|objectid_str) }}{% else %}{{ url_for('votacoes.lista') }}{% endif %}" style="color: var(--text-muted); font-size: 0.875rem; display: inline-flex; align-items: center; gap: 0.375rem; margin-bottom: 1.5rem; transition: var(--transition);" onhover="this.style.color='var(--text-primary)'">
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-      Cancelar e Voltar
+      Voltar
     </a>
 
     <!-- Header -->
+    <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap;">
+      <span class="badge {{ 'badge-green' if votacao.status=='ativa' else 'badge-purple' if votacao.status=='encerrada' else 'badge-yellow' }}" style="text-transform: uppercase; font-size: 0.65rem;">
+        {{ votacao.status | fmt_status }}
+      </span>
+      {% if not votacao.publica %}
+        <span class="badge badge-red" style="font-size: 0.65rem; display: inline-flex; align-items: center; gap: 0.25rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Sessão Privada
+        </span>
+      {% endif %}
+    </div>
     <h1 class="section-title" style="font-size: 1.75rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--text-primary);">{{ votacao.titulo }}</h1>
     {% if votacao.descricao %}
       <p class="section-subtitle" style="color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.5;">{{ votacao.descricao }}</p>
     {% endif %}
 
-    <!-- Candidate selection form -->
+    {% if mostrar_resultados %}
+      <!-- Context Messages for Results View -->
+      {% if ja_votou %}
+        <div style="padding: 1rem 1.25rem; background: rgba(34, 197, 94, 0.05); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: var(--radius-md); font-size: 0.875rem; color: #86EFAC; display: flex; align-items: center; gap: 0.625rem; margin-bottom: 2rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Assinatura digital confirmada. Seu voto foi contabilizado com sucesso no livro de consenso.
+        </div>
+      {% elif votacao.status != 'ativa' %}
+        <div style="padding: 1rem 1.25rem; background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: var(--radius-md); font-size: 0.875rem; color: #FDE68A; display: flex; align-items: center; gap: 0.625rem; margin-bottom: 2rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Esta eleição foi dada como finalizada. A urna de votos está encerrada para novos envios.
+        </div>
+      {% endif %}
+
+      <!-- Results View -->
+      <div class="card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+        <div class="card-header" style="border-bottom: 1px solid var(--border-subtle); padding: 1.25rem 1.75rem; display: flex; justify-content: space-between; align-items: center;">
+          <span class="card-title" style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--blue);"><path d="M12 20h9"/><path d="M3 20v-8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v8"/><path d="M3 12h18"/><path d="M14 2h6a2 2 0 0 1 2 2v10"/><path d="M14 6h3"/></svg>
+            Resultados Oficiais
+          </span>
+          <span class="text-muted text-sm" id="total-votos-display" style="font-weight: 600; color: var(--text-secondary);">{{ total_votos }} votos confirmados</span>
+        </div>
+        
+        <div class="card-body" id="resultados-container" style="padding: 1.75rem; display: flex; flex-direction: column; gap: 1.25rem;">
+          {% for item in contagem_display %}
+          <div class="resultado-bar" id="res-{{ loop.index }}" style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.25rem; transition: var(--transition);">
+            <div class="resultado-bar-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <span class="resultado-nome" style="font-weight: 600; font-size: 0.9rem; color: var(--text-primary); display: inline-flex; align-items: center;">
+                <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: linear-gradient(135deg, var(--blue) 0%, var(--purple) 100%); border-radius: 50%; font-size: 0.75rem; font-weight: 800; margin-right: 0.75rem; color: #FFF; box-shadow: 0 0 10px var(--blue-glow);">{{ item.candidato.numero }}</span>
+                {{ item.candidato.nome }}
+              </span>
+              
+              <div style="text-align: right; display: flex; align-items: center; gap: 0.5rem;">
+                <span style="font-weight: 700; font-size: 1rem; color: var(--text-primary);">{{ item.votos }}</span>
+                <span class="text-muted text-sm" style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">votos</span>
+                <span class="badge badge-blue" style="margin-left: 0.25rem; font-size: 0.7rem; background: var(--blue-glow); border: 1px solid var(--blue); color: var(--blue);">{{ item.pct }}%</span>
+              </div>
+            </div>
+            
+            {% if item.candidato.descricao %}
+              <p class="text-muted text-sm" style="color: var(--text-secondary); margin-bottom: 0.75rem; line-height: 1.4; padding-left: 2.5rem;">{{ item.candidato.descricao }}</p>
+            {% endif %}
+            
+            <div style="padding-left: 2.5rem;">
+              <div class="resultado-track" style="background: var(--bg-primary); border-radius: var(--radius-full); height: 6px; overflow: hidden; width: 100%;">
+                <div class="resultado-fill" style="width: {{ item.pct }}%; height: 100%; border-radius: var(--radius-full); transition: width 0.6s var(--ease); min-width: 2px;"
+                     data-candidato="{{ item.candidato._id|objectid_str }}"
+                     data-pct="{{ item.pct }}"></div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      <!-- Voting Form -->
     <form method="POST" action="{{ url_for('votacoes.votar', vid=votacao._id|objectid_str) }}" id="form-votar">
       <div class="candidatos-grid" id="grid-candidatos" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.25rem;">
         {% for c in candidatos %}
@@ -54,6 +121,7 @@
         </div>
       </div>
     </form>
+    {% endif %}
   </div>
 </div>
 {% endblock %}
@@ -81,13 +149,58 @@ function selecionarCandidato(id) {
     num.style.background = 'var(--blue)';
   }
   
-  document.getElementById('btn-confirmar-voto').disabled = false;
+  const btn = document.getElementById('btn-confirmar-voto');
+  if(btn) btn.disabled = false;
 }
 
-document.getElementById('form-votar').addEventListener('submit', function(e) {
-  const btn = document.getElementById('btn-confirmar-voto');
-  btn.innerHTML = '<div class="spinner" style="margin-right:0.5rem;"></div> Transmitindo Cédula...';
-  btn.disabled = true;
+const formVotar = document.getElementById('form-votar');
+if (formVotar) {
+  formVotar.addEventListener('submit', function(e) {
+    const btn = document.getElementById('btn-confirmar-voto');
+    btn.innerHTML = '<div class="spinner" style="margin-right:0.5rem;"></div> Transmitindo Cédula...';
+    btn.disabled = true;
+  });
+}
+
+{% if mostrar_resultados %}
+// Realtime results socket logic
+const VOTACAO_ID = "{{ votacao._id | objectid_str }}";
+const socket = io();
+
+socket.on('connect', () => {
+  socket.emit('join_votacao', { votacao_id: VOTACAO_ID });
 });
+
+socket.on('resultado_update', data => {
+  if (data.votacao_id !== VOTACAO_ID) return;
+  
+  const displayTotal = document.getElementById('total-votos-display');
+  if (displayTotal) displayTotal.textContent = `${data.total_votos} votos confirmados`;
+  
+  data.resultado.forEach(r => {
+    document.querySelectorAll('.resultado-fill').forEach(fill => {
+      const parent = fill.closest('.resultado-bar');
+      const nomeElement = parent?.querySelector('.resultado-nome');
+      if (nomeElement) {
+        // Exclude the candidate number span to check only candidate name
+        const clone = nomeElement.cloneNode(true);
+        const childSpan = clone.querySelector('span');
+        if (childSpan) childSpan.remove();
+        
+        const nomeText = clone.textContent.trim();
+        if (nomeText === r.nome) {
+          fill.style.width = r.pct + '%';
+          
+          const pctBadge = parent.querySelector('.badge-blue');
+          if (pctBadge) pctBadge.textContent = r.pct + '%';
+          
+          const vSpan = parent.querySelector('.resultado-bar-header span[style*="font-weight:700"]');
+          if (vSpan) vSpan.textContent = r.votos;
+        }
+      }
+    });
+  });
+});
+{% endif %}
 </script>
 {% endblock %}

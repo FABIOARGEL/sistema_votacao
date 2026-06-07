@@ -80,7 +80,7 @@
             <tr>
               <td style="padding: 0.875rem 1.25rem;"><code>{{ v._id|objectid_str }}</code></td>
               <td style="padding: 0.875rem 1.25rem;">
-                <a href="{{ url_for('votacoes.detalhe', vid=v._id|objectid_str) }}" style="color: var(--text-primary); font-weight: 600; transition: var(--transition);" onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='var(--text-primary)'">{{ v.titulo }}</a>
+                <a href="{{ url_for('votacoes.resultados' if v.status != 'ativa' else 'votacoes.votar', vid=v._id|objectid_str) }}" style="color: var(--text-primary); font-weight: 600; transition: var(--transition);" onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='var(--text-primary)'">{{ v.titulo }}</a>
               </td>
               <td style="padding: 0.875rem 1.25rem;">
                 <span class="badge {{ 'badge-green' if v.status=='ativa' else 'badge-purple' if v.status=='encerrada' else 'badge-yellow' }}" style="text-transform: uppercase; font-size: 0.65rem;">

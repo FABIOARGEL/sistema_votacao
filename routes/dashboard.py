@@ -48,7 +48,7 @@ def votacao_detail(vid: str):
         flash("Votação não encontrada.", "danger")
         return redirect(url_for("dashboard.index"))
 
-    if str(votacao.get("criador_id")) != current_user.id:
+    if str(votacao.get("criador_id", "")) != str(current_user.id):
         flash("Sem permissão para acessar este dashboard.", "danger")
         return redirect(url_for("dashboard.index"))
 
