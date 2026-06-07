@@ -247,7 +247,7 @@ def votar(vid: str):
         resp = enviar_voto(porta_urna, vid, current_user.id, candidato_id)
 
         if resp.get("status") == "ok":
-            flash("✅ Voto registrado com sucesso!", "success")
+            flash(" Voto registrado com sucesso!", "success")
             return redirect(url_for("votacoes.confirmacao", vid=vid, voto_id=resp.get("voto_id", "")))
         else:
             flash(f"Erro ao votar: {resp.get('motivo', 'Falha desconhecida')}", "danger")

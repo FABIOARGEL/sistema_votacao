@@ -4,7 +4,7 @@
 <div class="page" style="display:flex;align-items:center;justify-content:center;">
 <div class="container-sm">
   <div class="card fade-in" style="text-align:center;padding:3rem 2rem;border-color:var(--green);box-shadow:0 0 40px var(--green-glow);">
-    <div style="font-size:4rem;margin-bottom:1rem;animation:pulse-anim 1s ease;">✅</div>
+    <div style="font-size:4rem;margin-bottom:1rem;animation:pulse-anim 1s ease;"></div>
     <h1 style="font-size:1.75rem;font-weight:800;margin-bottom:0.5rem;color:var(--green);">Voto Registrado!</h1>
     <p class="text-muted mb-3">Seu voto foi recebido, validado e replicado com sucesso na infraestrutura distribuída.</p>
 
@@ -12,11 +12,11 @@
     <div class="card mb-3" style="background:var(--bg-primary);text-align:left;padding:1rem 1.25rem;">
       <div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;margin-bottom:0.75rem;">Caminho percorrido pelo voto</div>
       <div style="display:flex;flex-direction:column;gap:0.5rem;font-size:0.85rem;">
-        <div style="display:flex;align-items:center;gap:0.5rem;color:var(--green);">✅ <strong>Você</strong> → app.py</div>
-        <div style="display:flex;align-items:center;gap:0.5rem;color:var(--green);">✅ <strong>Coordenador</strong> → selecionou urna (round-robin)</div>
-        <div style="display:flex;align-items:center;gap:0.5rem;color:var(--green);">✅ <strong>Urna</strong> → validou e registrou</div>
-        <div style="display:flex;align-items:center;gap:0.5rem;color:var(--green);">✅ <strong>Contador primário</strong> → contabilizou</div>
-        <div style="display:flex;align-items:center;gap:0.5rem;color:var(--green);">✅ <strong>Réplicas</strong> → sincronizadas</div>
+        <div style="display:flex;align-items:center;gap:0.5rem;color:var(--green);"> <strong>Você</strong> → app.py</div>
+        <div style="display:flex;align-items:center;gap:0.5rem;color:var(--green);"> <strong>Coordenador</strong> → selecionou urna (round-robin)</div>
+        <div style="display:flex;align-items:center;gap:0.5rem;color:var(--green);"> <strong>Urna</strong> → validou e registrou</div>
+        <div style="display:flex;align-items:center;gap:0.5rem;color:var(--green);"> <strong>Contador primário</strong> → contabilizou</div>
+        <div style="display:flex;align-items:center;gap:0.5rem;color:var(--green);"> <strong>Réplicas</strong> → sincronizadas</div>
       </div>
     </div>
 
@@ -28,9 +28,9 @@
 
     <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;">
       <a href="{{ url_for('votacoes.detalhe', vid=votacao._id|objectid_str) }}" class="btn btn-primary" id="btn-ver-resultados">
-        📊 Ver Resultados
+         Ver Resultados
       </a>
-      <a href="{{ url_for('votacoes.lista') }}" class="btn btn-ghost">🗳️ Outras votações</a>
+      <a href="{{ url_for('votacoes.lista') }}" class="btn btn-ghost"> Outras votações</a>
     </div>
   </div>
 </div>

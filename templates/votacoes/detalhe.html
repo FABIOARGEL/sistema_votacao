@@ -11,28 +11,28 @@
         <span class="badge {{ 'badge-green' if votacao.status=='ativa' else 'badge-purple' if votacao.status=='encerrada' else 'badge-yellow' }}">
           {{ votacao.status | fmt_status }}
         </span>
-        {% if not votacao.publica %}<span class="badge badge-red">🔒 Privada</span>{% endif %}
+        {% if not votacao.publica %}<span class="badge badge-red"> Privada</span>{% endif %}
         {% if is_criador %}<span class="badge badge-blue">Criador</span>{% endif %}
       </div>
       <h1 style="font-size:1.75rem;font-weight:800;margin-bottom:0.25rem;">{{ votacao.titulo }}</h1>
       {% if votacao.descricao %}<p class="text-muted">{{ votacao.descricao }}</p>{% endif %}
       <div style="display:flex;gap:1.5rem;flex-wrap:wrap;margin-top:0.5rem;font-size:0.8rem;color:var(--text-muted);">
-        {% if votacao.inicio %}<span>▶️ {{ votacao.inicio | fmt_dt }}</span>{% endif %}
-        {% if votacao.fim %}<span>⏹️ {{ votacao.fim | fmt_dt }}</span>{% endif %}
-        <span>📊 {{ total_votos }} votos</span>
+        {% if votacao.inicio %}<span>▶ {{ votacao.inicio | fmt_dt }}</span>{% endif %}
+        {% if votacao.fim %}<span>⏹ {{ votacao.fim | fmt_dt }}</span>{% endif %}
+        <span> {{ total_votos }} votos</span>
       </div>
     </div>
     <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
       {% if votacao.status == 'ativa' and current_user.is_authenticated and not ja_votou %}
         <a href="{{ url_for('votacoes.votar', vid=votacao._id|objectid_str) }}" class="btn btn-primary btn-lg" id="btn-votar-agora">
-          🗳️ Votar Agora
+           Votar Agora
         </a>
       {% endif %}
       {% if is_criador %}
-        <a href="{{ url_for('dashboard.votacao_detail', vid=votacao._id|objectid_str) }}" class="btn btn-ghost">📊 Dashboard</a>
+        <a href="{{ url_for('dashboard.votacao_detail', vid=votacao._id|objectid_str) }}" class="btn btn-ghost"> Dashboard</a>
         {% if votacao.status == 'ativa' %}
         <form method="POST" action="{{ url_for('votacoes.encerrar', vid=votacao._id|objectid_str) }}" style="display:inline;" onsubmit="return confirm('Encerrar votação?')">
-          <button type="submit" class="btn btn-danger" id="btn-encerrar-votacao">⏹️ Encerrar</button>
+          <button type="submit" class="btn btn-danger" id="btn-encerrar-votacao">⏹ Encerrar</button>
         </form>
         {% endif %}
       {% endif %}
@@ -47,17 +47,17 @@
 
       <!-- Resultado / votação -->
       {% if ja_votou %}
-      <div class="alert alert-success">✅ Você já votou nesta eleição. Acompanhe os resultados abaixo.</div>
+      <div class="alert alert-success"> Você já votou nesta eleição. Acompanhe os resultados abaixo.</div>
       {% elif not current_user.is_authenticated %}
-      <div class="alert alert-info">ℹ️ <a href="{{ url_for('auth.login') }}" style="color:inherit;font-weight:600;">Faça login</a> para participar desta votação.</div>
+      <div class="alert alert-info">ℹ <a href="{{ url_for('auth.login') }}" style="color:inherit;font-weight:600;">Faça login</a> para participar desta votação.</div>
       {% elif votacao.status != 'ativa' %}
-      <div class="alert alert-warning">⚠️ Esta votação não está ativa.</div>
+      <div class="alert alert-warning"> Esta votação não está ativa.</div>
       {% endif %}
 
       <!-- Candidatos e resultados -->
       <div class="card">
         <div class="card-header">
-          <span class="card-title">🎯 Candidatos & Resultados</span>
+          <span class="card-title"> Candidatos & Resultados</span>
           <span class="text-muted text-sm" id="total-votos-display">{{ total_votos }} votos</span>
         </div>
         <div class="card-body" id="resultados-container">
@@ -95,7 +95,7 @@
       <!-- Status urnas -->
       <div class="card">
         <div class="card-header">
-          <span class="card-title">🗳️ Servidores de Urna</span>
+          <span class="card-title"> Servidores de Urna</span>
           <span class="badge badge-green" id="badge-urnas-online">{{ urnas | selectattr('status','eq','online') | list | length }} online</span>
         </div>
         <div class="card-body">
@@ -118,7 +118,7 @@
       <!-- Status contadores -->
       <div class="card">
         <div class="card-header">
-          <span class="card-title">🔢 Servidores de Contagem</span>
+          <span class="card-title"> Servidores de Contagem</span>
           <span class="badge badge-blue" id="badge-cont-online">{{ contadores | selectattr('status','eq','online') | list | length }} online</span>
         </div>
         <div class="card-body">
@@ -137,8 +137,8 @@
       <!-- Logs em tempo real -->
       <div class="card">
         <div class="card-header">
-          <span class="card-title">📜 Logs em Tempo Real</span>
-          <span class="badge badge-yellow" id="badge-live">⚡ AO VIVO</span>
+          <span class="card-title"> Logs em Tempo Real</span>
+          <span class="badge badge-yellow" id="badge-live"> AO VIVO</span>
         </div>
         <div class="card-body" style="padding:0.5rem;">
           <div class="log-terminal" id="log-terminal">

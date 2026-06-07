@@ -6,7 +6,7 @@
 <section class="hero">
   <div style="position:relative; z-index:1; max-width:700px;">
     <div class="badge badge-blue mb-2" style="margin:0 auto 1rem; display:inline-flex;">
-      🎓 Projeto Acadêmico · Sistemas Distribuídos
+       Projeto Acadêmico · Sistemas Distribuídos
     </div>
     <h1 class="hero-title">Votação Distribuída<br>em Tempo Real</h1>
     <p class="hero-subtitle">
@@ -15,7 +15,7 @@
     </p>
     <div class="hero-actions">
       <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg" id="btn-comecar">
-        🚀 Começar agora
+         Começar agora
       </a>
       <a href="{{ url_for('votacoes.lista') }}" class="btn btn-ghost btn-lg" id="btn-ver-votacoes">
         Ver votações
@@ -48,17 +48,17 @@
     </h2>
     <div class="grid-3" style="margin-top:2rem;">
       <div class="glass-card text-center fade-in">
-        <div style="font-size:2.5rem; margin-bottom:1rem;">🏛️</div>
+        <div style="font-size:2.5rem; margin-bottom:1rem;"></div>
         <h3 style="margin-bottom:0.5rem; font-weight:700;">Coordenador</h3>
         <p class="text-muted text-sm">Cada votação tem seu próprio coordenador que cria e monitora toda a infraestrutura de urnas e contadores.</p>
       </div>
       <div class="glass-card text-center fade-in" style="animation-delay:.1s">
-        <div style="font-size:2.5rem; margin-bottom:1rem;">🗳️</div>
+        <div style="font-size:2.5rem; margin-bottom:1rem;"></div>
         <h3 style="margin-bottom:0.5rem; font-weight:700;">Urnas</h3>
         <p class="text-muted text-sm">Múltiplas urnas independentes recebem votos em paralelo. Balanceamento round-robin garante distribuição uniforme.</p>
       </div>
       <div class="glass-card text-center fade-in" style="animation-delay:.2s">
-        <div style="font-size:2.5rem; margin-bottom:1rem;">🔢</div>
+        <div style="font-size:2.5rem; margin-bottom:1rem;"></div>
         <h3 style="margin-bottom:0.5rem; font-weight:700;">Contadores</h3>
         <p class="text-muted text-sm">Contadores replicam votos entre si garantindo consistência. Tolerância a falhas com recuperação automática.</p>
       </div>
@@ -72,14 +72,14 @@
       <div class="topology">
         <div class="server-card" style="display:inline-flex; align-items:center; gap:0.5rem; padding:0.6rem 1.2rem; background:var(--blue-glow); border-color:var(--blue);">
           <span class="server-dot online"></span>
-          <span style="font-weight:700; font-size:0.85rem;">🧭 Coordenador</span>
+          <span style="font-weight:700; font-size:0.85rem;"> Coordenador</span>
         </div>
         <div class="topo-line"></div>
         <div class="topology-row">
           {% for i in range(3) %}
           <div class="server-card online" style="min-width:100px;">
             <div class="server-dot online"></div>
-            <div class="server-name">🗳️ Urna {{ i+1 }}</div>
+            <div class="server-name"> Urna {{ i+1 }}</div>
             <div class="server-port">:800{{ i+1 }}</div>
           </div>
           {% endfor %}
@@ -89,7 +89,7 @@
           {% for i in range(2) %}
           <div class="server-card online" style="min-width:110px; border-color:var(--green);">
             <div class="server-dot online"></div>
-            <div class="server-name">🔢 Contador {{ i+1 }}</div>
+            <div class="server-name"> Contador {{ i+1 }}</div>
             <div class="server-port">:900{{ i+1 }}</div>
           </div>
           {% endfor %}
@@ -107,12 +107,12 @@
         <h2 style="font-size:1.5rem; font-weight:800; margin-bottom:1rem;">Conceitos de SD demonstrados</h2>
         <div style="display:flex; flex-direction:column; gap:0.75rem;">
           {% set features = [
-            ("🔄", "Comunicação entre processos", "TCP Sockets entre urnas, contadores e coordenador"),
-            ("📋", "Replicação de dados", "Votos replicados para todos os contadores"),
-            ("⚡", "Tolerância a falhas", "Detecção automática de servidores offline"),
-            ("🎯", "Coordenação distribuída", "Coordenador monitora e gerencia toda a infraestrutura"),
-            ("⚖️", "Balanceamento de carga", "Round-robin entre urnas disponíveis"),
-            ("✅", "Consistência", "Todos os contadores mantêm os mesmos resultados"),
+            ("", "Comunicação entre processos", "TCP Sockets entre urnas, contadores e coordenador"),
+            ("", "Replicação de dados", "Votos replicados para todos os contadores"),
+            ("", "Tolerância a falhas", "Detecção automática de servidores offline"),
+            ("", "Coordenação distribuída", "Coordenador monitora e gerencia toda a infraestrutura"),
+            ("", "Balanceamento de carga", "Round-robin entre urnas disponíveis"),
+            ("", "Consistência", "Todos os contadores mantêm os mesmos resultados"),
           ] %}
           {% for icon, title, desc in features %}
           <div style="display:flex; gap:1rem; align-items:flex-start; padding:0.875rem; background:var(--bg-glass); border:1px solid var(--border); border-radius:var(--radius-md);">
@@ -128,7 +128,7 @@
       <div style="display:flex; flex-direction:column; gap:1rem;">
         <div class="card" style="flex:1;">
           <div class="card-header">
-            <span class="card-title">🖥️ Stack Tecnológico</span>
+            <span class="card-title"> Stack Tecnológico</span>
           </div>
           <div class="card-body" style="display:flex; flex-direction:column; gap:0.75rem;">
             {% set stack = [

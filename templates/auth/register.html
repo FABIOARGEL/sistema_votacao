@@ -28,7 +28,7 @@
         <div style="position:relative;">
           <input type="password" id="senha" name="senha" placeholder="Mín. 6 caracteres" required minlength="6">
           <button type="button" onclick="toggleSenha('senha','olho1')"
-            style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-muted);" id="olho1">👁️</button>
+            style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-muted);" id="olho1"></button>
         </div>
         <!-- Indicador de força -->
         <div id="senha-strength" style="margin-top:0.4rem; height:4px; border-radius:2px; background:var(--border); overflow:hidden;">
@@ -41,7 +41,7 @@
         <div style="position:relative;">
           <input type="password" id="confirmar_senha" name="confirmar_senha" placeholder="Repita a senha" required minlength="6">
           <button type="button" onclick="toggleSenha('confirmar_senha','olho2')"
-            style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-muted);" id="olho2">👁️</button>
+            style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-muted);" id="olho2"></button>
         </div>
         <span id="conf-match" style="font-size:0.75rem;"></span>
       </div>
@@ -63,7 +63,7 @@
 function toggleSenha(inputId, btnId) {
   const inp = document.getElementById(inputId);
   inp.type = inp.type === 'password' ? 'text' : 'password';
-  document.getElementById(btnId).textContent = inp.type === 'password' ? '👁️' : '🔒';
+  document.getElementById(btnId).textContent = inp.type === 'password' ? '' : '';
 }
 
 // Força da senha
@@ -87,9 +87,9 @@ document.getElementById('senha').addEventListener('input', function() {
 document.getElementById('confirmar_senha').addEventListener('input', function() {
   const match = document.getElementById('conf-match');
   if (this.value === document.getElementById('senha').value) {
-    match.textContent = '✅ Senhas coincidem'; match.style.color = 'var(--green)';
+    match.textContent = ' Senhas coincidem'; match.style.color = 'var(--green)';
   } else {
-    match.textContent = '❌ Senhas diferentes'; match.style.color = 'var(--red)';
+    match.textContent = ' Senhas diferentes'; match.style.color = 'var(--red)';
   }
 });
 </script>

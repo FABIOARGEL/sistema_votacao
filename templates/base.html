@@ -15,7 +15,7 @@
 <!-- NAVBAR -->
 <nav class="navbar">
   <a href="{{ url_for('index') }}" class="navbar-brand">
-    <div class="logo-icon">🗳️</div>
+    <div class="logo-icon"></div>
     <span>VotoDistribuído</span>
   </a>
 
@@ -43,10 +43,10 @@
           <div style="padding:0.5rem 0.75rem; font-size:0.8rem; color:var(--text-secondary); border-bottom:1px solid var(--border); margin-bottom:0.25rem;">
             {{ current_user.email }}
           </div>
-          <a href="{{ url_for('auth.profile') }}" style="display:block; padding:0.5rem 0.75rem; color:var(--text-primary); text-decoration:none; border-radius:6px; font-size:0.875rem;" onmouseover="this.style.background='var(--bg-glass)'" onmouseout="this.style.background=''">👤 Perfil</a>
-          <a href="{{ url_for('dashboard.index') }}" style="display:block; padding:0.5rem 0.75rem; color:var(--text-primary); text-decoration:none; border-radius:6px; font-size:0.875rem;" onmouseover="this.style.background='var(--bg-glass)'" onmouseout="this.style.background=''">📊 Dashboard</a>
+          <a href="{{ url_for('auth.profile') }}" style="display:block; padding:0.5rem 0.75rem; color:var(--text-primary); text-decoration:none; border-radius:6px; font-size:0.875rem;" onmouseover="this.style.background='var(--bg-glass)'" onmouseout="this.style.background=''"> Perfil</a>
+          <a href="{{ url_for('dashboard.index') }}" style="display:block; padding:0.5rem 0.75rem; color:var(--text-primary); text-decoration:none; border-radius:6px; font-size:0.875rem;" onmouseover="this.style.background='var(--bg-glass)'" onmouseout="this.style.background=''"> Dashboard</a>
           <div style="border-top:1px solid var(--border); margin-top:0.25rem; padding-top:0.25rem;">
-            <a href="{{ url_for('auth.logout') }}" style="display:block; padding:0.5rem 0.75rem; color:var(--red); text-decoration:none; border-radius:6px; font-size:0.875rem;" onmouseover="this.style.background='var(--red-glow)'" onmouseout="this.style.background=''">🚪 Sair</a>
+            <a href="{{ url_for('auth.logout') }}" style="display:block; padding:0.5rem 0.75rem; color:var(--red); text-decoration:none; border-radius:6px; font-size:0.875rem;" onmouseover="this.style.background='var(--red-glow)'" onmouseout="this.style.background=''"> Sair</a>
           </div>
         </div>
       </div>
@@ -63,7 +63,7 @@
     <div style="position:fixed; top:72px; right:1.5rem; z-index:500; display:flex; flex-direction:column; gap:0.5rem; max-width:420px;">
       {% for cat, msg in messages %}
         <div class="alert alert-{{ cat }}" id="flash-{{ loop.index }}" style="cursor:pointer;" onclick="this.remove()">
-          <span>{{ '✅' if cat=='success' else '❌' if cat=='danger' else 'ℹ️' if cat=='info' else '⚠️' }}</span>
+          <span>{{ '' if cat=='success' else '' if cat=='danger' else 'ℹ' if cat=='info' else '' }}</span>
           <span>{{ msg }}</span>
         </div>
       {% endfor %}

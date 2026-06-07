@@ -5,11 +5,11 @@
 <div class="container-md">
   <a href="{{ url_for('votacoes.detalhe', vid=votacao._id|objectid_str) }}" style="color:var(--text-muted);text-decoration:none;font-size:0.875rem;display:inline-block;margin-bottom:1rem;">← Voltar</a>
 
-  <h1 class="section-title">🗳️ {{ votacao.titulo }}</h1>
+  <h1 class="section-title"> {{ votacao.titulo }}</h1>
   {% if votacao.descricao %}<p class="section-subtitle">{{ votacao.descricao }}</p>{% endif %}
 
   <div class="alert alert-info mb-3">
-    ℹ️ Selecione um candidato e confirme seu voto. Esta ação é <strong>irreversível</strong>.
+    ℹ Selecione um candidato e confirme seu voto. Esta ação é <strong>irreversível</strong>.
     Seu voto será enviado a uma urna via TCP e replicado aos contadores.
   </div>
 
@@ -20,7 +20,7 @@
              onclick="selecionarCandidato('{{ c._id|objectid_str }}')">
         <input type="radio" name="candidato_id" id="cand-{{ c._id|objectid_str }}"
                value="{{ c._id|objectid_str }}" required>
-        <div class="candidato-check">✓</div>
+        <div class="candidato-check"></div>
         <div class="candidato-numero">{{ c.numero }}</div>
         <div class="candidato-nome">{{ c.nome }}</div>
         {% if c.descricao %}<div class="candidato-desc">{{ c.descricao }}</div>{% endif %}
@@ -38,7 +38,7 @@
           </div>
         </div>
         <button type="submit" class="btn btn-primary btn-lg" id="btn-confirmar-voto" disabled>
-          ✅ Confirmar Voto
+           Confirmar Voto
         </button>
       </div>
     </div>

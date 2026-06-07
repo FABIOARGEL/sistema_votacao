@@ -25,7 +25,7 @@
         <div style="position:relative;">
           <input type="password" id="senha" name="senha" placeholder="••••••••" required autocomplete="current-password">
           <button type="button" onclick="toggleSenha('senha','olho-senha')"
-            style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:1.1rem;" id="olho-senha">👁️</button>
+            style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:1.1rem;" id="olho-senha"></button>
         </div>
       </div>
       <div class="flex-between mb-2">
@@ -54,7 +54,7 @@ function toggleSenha(inputId, btnId) {
   const inp = document.getElementById(inputId);
   const btn = document.getElementById(btnId);
   inp.type = inp.type === 'password' ? 'text' : 'password';
-  btn.textContent = inp.type === 'password' ? '👁️' : '🔒';
+  btn.textContent = inp.type === 'password' ? '' : '';
 }
 </script>
 {% endblock %}

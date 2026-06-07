@@ -3,7 +3,7 @@
 {% block content %}
 <div class="page">
 <div class="container-sm">
-  <h1 class="section-title">👤 Meu Perfil</h1>
+  <h1 class="section-title"> Meu Perfil</h1>
   <div class="card fade-in">
     <div class="card-body">
       <!-- Avatar -->
@@ -25,7 +25,7 @@
           <label for="nome">Nome de exibição</label>
           <input type="text" id="nome" name="nome" value="{{ user.nome }}" required>
         </div>
-        <button type="submit" class="btn btn-primary" id="btn-salvar-perfil">💾 Salvar alterações</button>
+        <button type="submit" class="btn btn-primary" id="btn-salvar-perfil"> Salvar alterações</button>
       </form>
     </div>
   </div>
@@ -34,10 +34,10 @@
   <div class="card mt-2">
     <div class="card-header"><span class="card-title">Ações</span></div>
     <div class="card-body" style="display:flex;gap:0.75rem;flex-wrap:wrap;">
-      <a href="{{ url_for('votacoes.lista') }}" class="btn btn-ghost">🗳️ Ver votações</a>
-      <a href="{{ url_for('dashboard.index') }}" class="btn btn-ghost">📊 Dashboard</a>
+      <a href="{{ url_for('votacoes.lista') }}" class="btn btn-ghost"> Ver votações</a>
+      <a href="{{ url_for('dashboard.index') }}" class="btn btn-ghost"> Dashboard</a>
       <a href="{{ url_for('votacoes.criar') }}" class="btn btn-outline">+ Criar votação</a>
-      <a href="{{ url_for('auth.logout') }}" class="btn btn-danger">🚪 Sair</a>
+      <a href="{{ url_for('auth.logout') }}" class="btn btn-danger"> Sair</a>
     </div>
   </div>
 </div>

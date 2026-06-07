@@ -7,7 +7,7 @@
   <!-- Cabeçalho -->
   <div class="flex-between mb-3" style="flex-wrap:wrap;gap:1rem;">
     <div>
-      <h1 class="section-title" style="margin-bottom:0.25rem;">🗳️ Votações</h1>
+      <h1 class="section-title" style="margin-bottom:0.25rem;"> Votações</h1>
       <p class="text-muted text-sm">Participe de votações distribuídas em andamento</p>
     </div>
     {% if current_user.is_authenticated %}
@@ -18,7 +18,7 @@
   <!-- Minhas votações -->
   {% if minhas %}
   <div class="mb-3">
-    <h2 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:var(--text-secondary);">📋 MINHAS VOTAÇÕES</h2>
+    <h2 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:var(--text-secondary);"> MINHAS VOTAÇÕES</h2>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;">
       {% for v in minhas %}
       <a href="{{ url_for('votacoes.detalhe', vid=v._id|objectid_str) }}" class="votacao-card">
@@ -26,18 +26,18 @@
           <span class="badge {{ 'badge-green' if v.status=='ativa' else 'badge-purple' if v.status=='encerrada' else 'badge-yellow' }}">
             {{ v.status | fmt_status }}
           </span>
-          {% if not v.publica %}<span class="badge badge-red">🔒 Privada</span>{% endif %}
+          {% if not v.publica %}<span class="badge badge-red"> Privada</span>{% endif %}
         </div>
         <div class="votacao-titulo">{{ v.titulo }}</div>
         {% if v.descricao %}<div class="votacao-desc">{{ v.descricao }}</div>{% endif %}
         <div class="votacao-meta">
-          <span>🗳️ {{ v.qtd_urnas }} urnas</span>
-          <span>🔢 {{ v.qtd_contadores }} contadores</span>
-          <span>📊 {{ v.total_votos or 0 }} votos</span>
+          <span> {{ v.qtd_urnas }} urnas</span>
+          <span> {{ v.qtd_contadores }} contadores</span>
+          <span> {{ v.total_votos or 0 }} votos</span>
         </div>
         <div class="votacao-footer">
           <span class="text-muted text-sm">{{ v.criada_em | fmt_dt }}</span>
-          <a href="{{ url_for('dashboard.votacao_detail', vid=v._id|objectid_str) }}" class="btn btn-ghost btn-sm" onclick="event.stopPropagation()">📊 Dashboard</a>
+          <a href="{{ url_for('dashboard.votacao_detail', vid=v._id|objectid_str) }}" class="btn btn-ghost btn-sm" onclick="event.stopPropagation()"> Dashboard</a>
         </div>
       </a>
       {% endfor %}
@@ -47,7 +47,7 @@
   {% endif %}
 
   <!-- Votações públicas -->
-  <h2 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:var(--text-secondary);">🌐 VOTAÇÕES PÚBLICAS</h2>
+  <h2 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:var(--text-secondary);"> VOTAÇÕES PÚBLICAS</h2>
   {% if publicas %}
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;">
     {% for v in publicas %}
@@ -61,16 +61,16 @@
       <div class="votacao-titulo">{{ v.titulo }}</div>
       {% if v.descricao %}<div class="votacao-desc">{{ v.descricao }}</div>{% endif %}
       <div class="votacao-meta">
-        <span>🗳️ {{ v.qtd_urnas }} urnas</span>
-        <span>🔢 {{ v.qtd_contadores }} contadores</span>
-        {% if v.fim %}<span>⏱️ Até {{ v.fim | fmt_dt }}</span>{% endif %}
+        <span> {{ v.qtd_urnas }} urnas</span>
+        <span> {{ v.qtd_contadores }} contadores</span>
+        {% if v.fim %}<span>⏱ Até {{ v.fim | fmt_dt }}</span>{% endif %}
       </div>
     </a>
     {% endfor %}
   </div>
   {% else %}
   <div class="glass-card text-center" style="padding:3rem;">
-    <div style="font-size:3rem;margin-bottom:1rem;">🗳️</div>
+    <div style="font-size:3rem;margin-bottom:1rem;"></div>
     <h3 style="margin-bottom:0.5rem;">Nenhuma votação pública ainda</h3>
     <p class="text-muted text-sm mb-2">Seja o primeiro a criar uma!</p>
     {% if current_user.is_authenticated %}

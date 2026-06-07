@@ -11,15 +11,15 @@
       <h1 style="font-size:1.5rem;font-weight:800;margin-top:0.25rem;">{{ votacao.titulo }}</h1>
       <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:0.5rem;">
         <span class="badge {{ 'badge-green' if votacao.status=='ativa' else 'badge-purple' if votacao.status=='encerrada' else 'badge-yellow' }}">{{ votacao.status | fmt_status }}</span>
-        <span class="text-muted text-sm">🗳️ {{ votacao.qtd_urnas }} urnas · 🔢 {{ votacao.qtd_contadores }} contadores</span>
-        <span class="text-muted text-sm">📊 {{ total_votos }} votos totais</span>
+        <span class="text-muted text-sm"> {{ votacao.qtd_urnas }} urnas ·  {{ votacao.qtd_contadores }} contadores</span>
+        <span class="text-muted text-sm"> {{ total_votos }} votos totais</span>
       </div>
     </div>
     <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
-      <a href="{{ url_for('votacoes.detalhe', vid=votacao._id|objectid_str) }}" class="btn btn-ghost btn-sm">🗳️ Ver votação</a>
+      <a href="{{ url_for('votacoes.detalhe', vid=votacao._id|objectid_str) }}" class="btn btn-ghost btn-sm"> Ver votação</a>
       {% if votacao.status == 'ativa' %}
       <form method="POST" action="{{ url_for('votacoes.encerrar', vid=votacao._id|objectid_str) }}" onsubmit="return confirm('Encerrar?')">
-        <button class="btn btn-danger btn-sm" id="btn-enc-dash">⏹️ Encerrar</button>
+        <button class="btn btn-danger btn-sm" id="btn-enc-dash">⏹ Encerrar</button>
       </form>
       {% endif %}
     </div>
@@ -30,22 +30,22 @@
     <div class="stat-card green">
       <span class="stat-label">Total de Votos</span>
       <span class="stat-value" id="d-total">{{ total_votos }}</span>
-      <span class="stat-icon">📊</span>
+      <span class="stat-icon"></span>
     </div>
     <div class="stat-card">
       <span class="stat-label">Urnas Online</span>
       <span class="stat-value" id="d-urnas">{{ urnas | selectattr('status','eq','online') | list | length }}/{{ urnas|length }}</span>
-      <span class="stat-icon">🗳️</span>
+      <span class="stat-icon"></span>
     </div>
     <div class="stat-card blue">
       <span class="stat-label">Contadores Online</span>
       <span class="stat-value" id="d-cont">{{ contadores | selectattr('status','eq','online') | list | length }}/{{ contadores|length }}</span>
-      <span class="stat-icon">🔢</span>
+      <span class="stat-icon"></span>
     </div>
     <div class="stat-card yellow">
       <span class="stat-label">Coord. Porta</span>
       <span class="stat-value" style="font-size:1.25rem;">{{ votacao.porta_coordenador or '—' }}</span>
-      <span class="stat-icon">🧭</span>
+      <span class="stat-icon"></span>
     </div>
   </div>
 
@@ -54,8 +54,8 @@
     <div style="display:flex;flex-direction:column;gap:1rem;">
       <div class="card">
         <div class="card-header">
-          <span class="card-title">📊 Resultados em Tempo Real</span>
-          <span class="badge badge-yellow">⚡ AO VIVO</span>
+          <span class="card-title"> Resultados em Tempo Real</span>
+          <span class="badge badge-yellow"> AO VIVO</span>
         </div>
         <div class="card-body">
           <canvas id="chart-resultado" height="220"></canvas>
@@ -64,7 +64,7 @@
 
       <!-- Barras de resultado -->
       <div class="card">
-        <div class="card-header"><span class="card-title">🎯 Detalhamento por Candidato</span></div>
+        <div class="card-header"><span class="card-title"> Detalhamento por Candidato</span></div>
         <div class="card-body" id="barras-resultado">
           {% set total_safe = total_votos if total_votos > 0 else 1 %}
           {% for i in range(candidatos|length) %}
@@ -96,19 +96,19 @@
 
       <!-- Topologia visual -->
       <div class="card">
-        <div class="card-header"><span class="card-title">🏗️ Infraestrutura Ativa</span></div>
+        <div class="card-header"><span class="card-title"> Infraestrutura Ativa</span></div>
         <div class="card-body">
           <div class="topology" style="padding:0.5rem;">
             <div class="server-card" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.5rem 1rem;background:var(--blue-glow);border-color:var(--blue);">
               <span class="server-dot online"></span>
-              <span style="font-size:0.8rem;font-weight:700;">🧭 Coordenador :{{ votacao.porta_coordenador }}</span>
+              <span style="font-size:0.8rem;font-weight:700;"> Coordenador :{{ votacao.porta_coordenador }}</span>
             </div>
             <div class="topo-line"></div>
             <div class="topology-row" id="topo-urnas">
               {% for u in urnas %}
               <div class="server-card {{ u.status }}" id="tu-{{ u.porta }}" style="min-width:90px;">
                 <div class="server-dot {{ u.status }}"></div>
-                <div class="server-name">🗳️ Urna</div>
+                <div class="server-name"> Urna</div>
                 <div class="server-port">:{{ u.porta }}</div>
                 <div class="server-votes">{{ u.votos_recebidos or 0 }}</div>
               </div>
@@ -119,7 +119,7 @@
               {% for c in contadores %}
               <div class="server-card {{ c.status }}" id="tc-{{ c.porta }}" style="min-width:90px;border-color:{% if c.status=='online' %}var(--green){% else %}var(--border){% endif %};">
                 <div class="server-dot {{ c.status }}"></div>
-                <div class="server-name">🔢 Contador</div>
+                <div class="server-name"> Contador</div>
                 <div class="server-port">:{{ c.porta }}</div>
               </div>
               {% endfor %}
@@ -131,10 +131,10 @@
       <!-- Logs em tempo real -->
       <div class="card" style="flex:1;">
         <div class="card-header">
-          <span class="card-title">📜 Logs do Sistema</span>
+          <span class="card-title"> Logs do Sistema</span>
           <div style="display:flex;gap:0.5rem;align-items:center;">
-            <span class="badge badge-yellow">⚡ AO VIVO</span>
-            <button onclick="document.getElementById('log-dash').innerHTML=''" class="btn btn-ghost btn-sm">🗑️</button>
+            <span class="badge badge-yellow"> AO VIVO</span>
+            <button onclick="document.getElementById('log-dash').innerHTML=''" class="btn btn-ghost btn-sm"></button>
           </div>
         </div>
         <div class="card-body" style="padding:0.5rem;">

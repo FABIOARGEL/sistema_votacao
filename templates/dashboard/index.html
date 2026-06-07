@@ -5,7 +5,7 @@
 <div class="container">
   <div class="flex-between mb-3" style="flex-wrap:wrap;gap:1rem;">
     <div>
-      <h1 class="section-title" style="margin-bottom:0.25rem;">📊 Dashboard</h1>
+      <h1 class="section-title" style="margin-bottom:0.25rem;"> Dashboard</h1>
       <p class="text-muted text-sm">Olá, <strong>{{ current_user.nome }}</strong> — visão geral do sistema</p>
     </div>
     <a href="{{ url_for('votacoes.criar') }}" class="btn btn-primary" id="btn-dash-criar">+ Nova Votação</a>
@@ -16,34 +16,34 @@
     <div class="stat-card">
       <span class="stat-label">Total Votações</span>
       <span class="stat-value" id="s-votacoes">{{ total_votacoes }}</span>
-      <span class="stat-icon">🗳️</span>
+      <span class="stat-icon"></span>
     </div>
     <div class="stat-card green">
       <span class="stat-label">Votos Confirmados</span>
       <span class="stat-value" id="s-votos">{{ total_votos }}</span>
-      <span class="stat-icon">✅</span>
+      <span class="stat-icon"></span>
     </div>
     <div class="stat-card blue">
       <span class="stat-label">Urnas Online</span>
       <span class="stat-value" id="s-urnas">{{ urnas_online }}</span>
-      <span class="stat-icon">🟢</span>
+      <span class="stat-icon"></span>
     </div>
     <div class="stat-card yellow">
       <span class="stat-label">Contadores Online</span>
       <span class="stat-value" id="s-cont">{{ cont_online }}</span>
-      <span class="stat-icon">🔢</span>
+      <span class="stat-icon"></span>
     </div>
     <div class="stat-card purple">
       <span class="stat-label">Usuários</span>
       <span class="stat-value">{{ total_usuarios }}</span>
-      <span class="stat-icon">👥</span>
+      <span class="stat-icon"></span>
     </div>
   </div>
 
   <div class="grid-2">
     <!-- Minhas votações -->
     <div>
-      <h2 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:var(--text-secondary);">📋 MINHAS VOTAÇÕES</h2>
+      <h2 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:var(--text-secondary);"> MINHAS VOTAÇÕES</h2>
       {% if minhas %}
       <div style="display:flex;flex-direction:column;gap:0.75rem;">
         {% for v in minhas %}
@@ -55,12 +55,12 @@
             </span>
           </div>
           <div style="font-size:0.8rem;color:var(--text-muted);display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:0.75rem;">
-            <span>🗳️ {{ v.qtd_urnas }} urnas</span>
-            <span>🔢 {{ v.qtd_contadores }} contadores</span>
-            <span>📊 {{ v.total_votos or 0 }} votos</span>
+            <span> {{ v.qtd_urnas }} urnas</span>
+            <span> {{ v.qtd_contadores }} contadores</span>
+            <span> {{ v.total_votos or 0 }} votos</span>
           </div>
           <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-            <a href="{{ url_for('dashboard.votacao_detail', vid=v._id|objectid_str) }}" class="btn btn-ghost btn-sm">📊 Dashboard</a>
+            <a href="{{ url_for('dashboard.votacao_detail', vid=v._id|objectid_str) }}" class="btn btn-ghost btn-sm"> Dashboard</a>
             <a href="{{ url_for('votacoes.detalhe', vid=v._id|objectid_str) }}" class="btn btn-outline btn-sm">Ver</a>
           </div>
         </div>
@@ -68,7 +68,7 @@
       </div>
       {% else %}
       <div class="glass-card text-center" style="padding:2rem;">
-        <div style="font-size:2rem;margin-bottom:0.75rem;">🗳️</div>
+        <div style="font-size:2rem;margin-bottom:0.75rem;"></div>
         <p class="text-muted text-sm mb-2">Você ainda não criou votações</p>
         <a href="{{ url_for('votacoes.criar') }}" class="btn btn-primary btn-sm">Criar primeira votação</a>
       </div>
@@ -77,7 +77,7 @@
 
     <!-- Log em tempo real -->
     <div>
-      <h2 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:var(--text-secondary);">📜 LOGS DO SISTEMA <span class="badge badge-yellow" style="font-size:0.6rem;">⚡ AO VIVO</span></h2>
+      <h2 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:var(--text-secondary);"> LOGS DO SISTEMA <span class="badge badge-yellow" style="font-size:0.6rem;"> AO VIVO</span></h2>
       <div class="log-terminal" id="log-global" style="max-height:420px;">
         {% for l in logs_recentes %}
         <div class="log-line">

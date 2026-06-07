@@ -69,10 +69,10 @@ def create_app():
     @app.template_filter("fmt_status")
     def fmt_status(s):
         emojis = {
-            "online": "🟢", "offline": "🔴", "iniciando": "🟡",
-            "ativa": "🟢", "encerrada": "⚫", "configurando": "🟡", "erro": "🔴",
+            "online": "", "offline": "", "iniciando": "",
+            "ativa": "", "encerrada": "", "configurando": "", "erro": "",
         }
-        return emojis.get(s, "⚪") + " " + (s or "").capitalize()
+        return emojis.get(s, "") + " " + (s or "").capitalize()
 
     @app.template_filter("objectid_str")
     def objectid_str(v):
