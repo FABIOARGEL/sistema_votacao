@@ -1,45 +1,85 @@
 {% extends "base.html" %}
 {% block title %}Meu Perfil — VotoDistribuído{% endblock %}
-{% block content %}
-<div class="page">
-<div class="container-sm">
-  <h1 class="section-title"> Meu Perfil</h1>
-  <div class="card fade-in">
-    <div class="card-body">
-      <!-- Avatar -->
-      <div class="text-center mb-3">
-        <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;margin:0 auto 1rem;">
-          {% if user.foto %}<img src="{{ user.foto }}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">
-          {% else %}{{ user.nome[0].upper() }}{% endif %}
-        </div>
-        <h2 style="font-size:1.25rem;font-weight:700;">{{ user.nome }}</h2>
-        <p class="text-muted text-sm">{{ user.email }}</p>
-        {% if user.google_id %}
-          <span class="badge badge-blue mt-1">Google</span>
-        {% endif %}
-        <p class="text-muted text-sm mt-1">Membro desde {{ user.criado_em | fmt_dt }}</p>
-      </div>
-      <div class="divider"></div>
-      <form method="POST">
-        <div class="form-group">
-          <label for="nome">Nome de exibição</label>
-          <input type="text" id="nome" name="nome" value="{{ user.nome }}" required>
-        </div>
-        <button type="submit" class="btn btn-primary" id="btn-salvar-perfil"> Salvar alterações</button>
-      </form>
-    </div>
-  </div>
 
-  <!-- Ações rápidas -->
-  <div class="card mt-2">
-    <div class="card-header"><span class="card-title">Ações</span></div>
-    <div class="card-body" style="display:flex;gap:0.75rem;flex-wrap:wrap;">
-      <a href="{{ url_for('votacoes.lista') }}" class="btn btn-ghost"> Ver votações</a>
-      <a href="{{ url_for('dashboard.index') }}" class="btn btn-ghost"> Dashboard</a>
-      <a href="{{ url_for('votacoes.criar') }}" class="btn btn-outline">+ Criar votação</a>
-      <a href="{{ url_for('auth.logout') }}" class="btn btn-danger"> Sair</a>
+{% block content %}
+<div class="page" style="padding: 3rem 1rem;">
+  <div class="container-sm" style="max-width: 600px; margin: 0 auto;">
+    
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem;">
+      <div style="color: var(--blue); padding: 0.5rem; background: var(--blue-glow); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <h1 class="section-title" style="margin: 0; font-size: 1.75rem;">Configurações de Perfil</h1>
     </div>
+
+    <!-- PROFILE CARD -->
+    <div class="card fade-in" style="margin-bottom: 2rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); overflow: hidden;">
+      <div class="card-body" style="padding: 2.25rem;">
+        
+        <!-- Avatar and Main Info -->
+        <div class="text-center" style="margin-bottom: 2rem; text-align: center;">
+          <div style="width: 88px; height: 88px; border-radius: 50%; background: linear-gradient(135deg, var(--blue) 0%, var(--purple) 100%); display: flex; align-items: center; justify-content: center; font-size: 2.25rem; font-weight: 800; margin: 0 auto 1.25rem; box-shadow: 0 0 20px var(--blue-glow); border: 2.5px solid var(--border); color: #FFF; overflow: hidden;">
+            {% if user.foto %}
+              <img src="{{ user.foto }}" style="width: 100%; height: 100%; object-fit: cover;" alt="{{ user.nome }}">
+            {% else %}
+              {{ user.nome[0].upper() }}
+            {% endif %}
+          </div>
+          
+          <h2 style="font-size: 1.35rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem;">{{ user.nome }}</h2>
+          <p class="text-muted text-sm" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">{{ user.email }}</p>
+          
+          <div style="display: flex; gap: 0.5rem; justify-content: center; align-items: center; flex-wrap: wrap;">
+            {% if user.google_id %}
+              <span class="badge badge-blue" style="font-size: 0.7rem; padding: 0.25rem 0.625rem; border-radius: 99px; background: var(--blue-glow); border: 1px solid var(--blue); color: var(--blue);">Conta Google</span>
+            {% else %}
+              <span class="badge" style="font-size: 0.7rem; padding: 0.25rem 0.625rem; border-radius: 99px; background: var(--border-subtle); border: 1px solid var(--border); color: var(--text-secondary);">Acesso Local</span>
+            {% endif %}
+            <span style="font-size: 0.75rem; color: var(--text-muted);">Membro desde {{ user.criado_em | fmt_dt }}</span>
+          </div>
+        </div>
+
+        <div class="divider" style="height: 1px; background: var(--border-subtle); margin: 1.75rem 0;"></div>
+
+        <!-- Update profile form -->
+        <form method="POST">
+          <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label for="nome" style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600;">Nome Completo</label>
+            <input type="text" id="nome" name="nome" value="{{ user.nome }}" required style="width: 100%; padding: 0.75rem 1rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 0.875rem; transition: var(--transition);" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'">
+          </div>
+          
+          <button type="submit" class="btn btn-primary" id="btn-salvar-perfil" style="padding: 0.65rem 1.5rem; font-weight: 600; font-size: 0.875rem;">
+            Salvar Alterações
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+      <div class="card-header" style="border-bottom: 1px solid var(--border-subtle); padding: 1.25rem 1.75rem;">
+        <span class="card-title" style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary);">Ações Rápidas</span>
+      </div>
+      <div class="card-body" style="padding: 1.5rem 1.75rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <a href="{{ url_for('votacoes.lista') }}" class="btn btn-ghost" style="border: 1px solid var(--border); font-size: 0.8125rem; font-weight: 500; display: inline-flex; align-items: center; gap: 0.375rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M3 20v-8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v8"/><path d="M3 12h18"/><path d="M14 2h6a2 2 0 0 1 2 2v10"/><path d="M14 6h3"/></svg>
+          Explorar Votações
+        </a>
+        <a href="{{ url_for('dashboard.index') }}" class="btn btn-ghost" style="border: 1px solid var(--border); font-size: 0.8125rem; font-weight: 500; display: inline-flex; align-items: center; gap: 0.375rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+          Meu Painel
+        </a>
+        <a href="{{ url_for('votacoes.criar') }}" class="btn btn-ghost" style="border: 1px solid var(--border); color: var(--blue); font-size: 0.8125rem; font-weight: 500; display: inline-flex; align-items: center; gap: 0.375rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nova Votação
+        </a>
+        <a href="{{ url_for('auth.logout') }}" class="btn btn-ghost" style="border: 1px solid rgba(239, 68, 68, 0.2); color: var(--red); font-size: 0.8125rem; font-weight: 500; display: inline-flex; align-items: center; gap: 0.375rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Desconectar
+        </a>
+      </div>
+    </div>
+
   </div>
-</div>
 </div>
 {% endblock %}

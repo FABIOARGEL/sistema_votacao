@@ -1,82 +1,150 @@
 {% extends "base.html" %}
-{% block title %}Votações — VotoDistribuído{% endblock %}
+{% block title %}Votações Ativas — VotoDistribuído{% endblock %}
+
 {% block content %}
 <div class="page">
 <div class="container">
 
-  <!-- Cabeçalho -->
-  <div class="flex-between mb-3" style="flex-wrap:wrap;gap:1rem;">
+  <!-- Header -->
+  <div class="flex-between mb-3" style="flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1.5rem;">
     <div>
-      <h1 class="section-title" style="margin-bottom:0.25rem;"> Votações</h1>
-      <p class="text-muted text-sm">Participe de votações distribuídas em andamento</p>
+      <h1 class="section-title" style="margin-bottom: 0.25rem; font-size: 1.75rem;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--blue);"><path d="M12 22h9"/><path d="M3 20v-8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v8"/><path d="M3 12h18"/><path d="M14 2h6a2 2 0 0 1 2 2v10"/><path d="M14 6h3"/></svg>
+        Sessões de Votação
+      </h1>
+      <p class="text-muted text-sm">Consulte, audite e participe das eleições ativas na rede distribuída</p>
     </div>
     {% if current_user.is_authenticated %}
-    <a href="{{ url_for('votacoes.criar') }}" class="btn btn-primary" id="btn-nova-votacao">+ Nova Votação</a>
+    <a href="{{ url_for('votacoes.criar') }}" class="btn btn-primary" id="btn-nova-votacao" style="display: inline-flex; align-items: center; font-weight: 600;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.375rem;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nova Votação
+    </a>
     {% endif %}
   </div>
 
   <!-- Minhas votações -->
   {% if minhas %}
   <div class="mb-3">
-    <h2 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:var(--text-secondary);"> MINHAS VOTAÇÕES</h2>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;">
+    <h2 style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 1.25rem; color: var(--text-muted);">Minhas Votações Administradas</h2>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem;">
       {% for v in minhas %}
-      <a href="{{ url_for('votacoes.detalhe', vid=v._id|objectid_str) }}" class="votacao-card">
+      <a href="{{ url_for('votacoes.detalhe', vid=v._id|objectid_str) }}" class="votacao-card fade-in" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; text-decoration: none; color: inherit; transition: var(--transition); display: flex; flex-direction: column; gap: 0.75rem;">
+        
         <div class="flex-between">
-          <span class="badge {{ 'badge-green' if v.status=='ativa' else 'badge-purple' if v.status=='encerrada' else 'badge-yellow' }}">
+          <span class="badge {{ 'badge-green' if v.status=='ativa' else 'badge-purple' if v.status=='encerrada' else 'badge-yellow' }}" style="text-transform: uppercase; font-size: 0.65rem;">
             {{ v.status | fmt_status }}
           </span>
-          {% if not v.publica %}<span class="badge badge-red"> Privada</span>{% endif %}
+          <div style="display: flex; gap: 0.375rem;">
+            {% if not v.publica %}
+              <span class="badge badge-red" style="font-size: 0.65rem; display: inline-flex; align-items: center;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.25rem;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Privada
+              </span>
+            {% else %}
+              <span class="badge badge-blue" style="font-size: 0.65rem; display: inline-flex; align-items: center;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.25rem;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                Pública
+              </span>
+            {% endif %}
+          </div>
         </div>
-        <div class="votacao-titulo">{{ v.titulo }}</div>
-        {% if v.descricao %}<div class="votacao-desc">{{ v.descricao }}</div>{% endif %}
-        <div class="votacao-meta">
-          <span> {{ v.qtd_urnas }} urnas</span>
-          <span> {{ v.qtd_contadores }} contadores</span>
-          <span> {{ v.total_votos or 0 }} votos</span>
+
+        <div class="votacao-titulo" style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">{{ v.titulo }}</div>
+        
+        {% if v.descricao %}
+          <div class="votacao-desc" style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.45; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">{{ v.descricao }}</div>
+        {% endif %}
+        
+        <div class="votacao-meta" style="display: flex; gap: 0.75rem; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; flex-wrap: wrap;">
+          <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+            {{ v.qtd_urnas }} Urnas
+          </span>
+          <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+            {{ v.qtd_contadores }} Contadores
+          </span>
+          <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+            {{ v.total_votos or 0 }} Votos
+          </span>
         </div>
-        <div class="votacao-footer">
-          <span class="text-muted text-sm">{{ v.criada_em | fmt_dt }}</span>
-          <a href="{{ url_for('dashboard.votacao_detail', vid=v._id|objectid_str) }}" class="btn btn-ghost btn-sm" onclick="event.stopPropagation()"> Dashboard</a>
+
+        <div class="votacao-footer" style="margin-top: auto; display: flex; justify-content: space-between; align-items: center; padding-top: 0.75rem; border-top: 1px solid var(--border-subtle);">
+          <span class="text-muted text-sm" style="font-size: 0.75rem; color: var(--text-faint);">{{ v.criada_em | fmt_dt }}</span>
+          <span class="btn btn-ghost btn-sm" onclick="event.preventDefault(); window.location.href='{{ url_for('dashboard.votacao_detail', vid=v._id|objectid_str) }}';" style="font-size: 0.75rem; padding: 0.25rem 0.625rem; border: 1px solid var(--border);">
+            Painel Geral
+          </span>
         </div>
+
       </a>
       {% endfor %}
     </div>
   </div>
-  <div class="divider"></div>
+  
+  <div class="divider" style="height: 1px; background: var(--border-subtle); margin: 2rem 0;"></div>
   {% endif %}
 
   <!-- Votações públicas -->
-  <h2 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:var(--text-secondary);"> VOTAÇÕES PÚBLICAS</h2>
+  <h2 style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 1.25rem; color: var(--text-muted);">Sessões Públicas Ativas</h2>
+  
   {% if publicas %}
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;">
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem;">
     {% for v in publicas %}
-    <a href="{{ url_for('votacoes.detalhe', vid=v._id|objectid_str) }}" class="votacao-card fade-in">
+    <a href="{{ url_for('votacoes.detalhe', vid=v._id|objectid_str) }}" class="votacao-card fade-in" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; text-decoration: none; color: inherit; transition: var(--transition); display: flex; flex-direction: column; gap: 0.75rem;">
+      
       <div class="flex-between">
-        <span class="badge {{ 'badge-green' if v.status=='ativa' else 'badge-purple' }}">
+        <span class="badge {{ 'badge-green' if v.status=='ativa' else 'badge-purple' }}" style="text-transform: uppercase; font-size: 0.65rem;">
           {{ v.status | fmt_status }}
         </span>
-        <span class="text-muted text-sm">{{ v.total_votos or 0 }} votos</span>
+        <span class="text-muted text-sm" style="font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.25rem; color: var(--text-secondary);">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+          {{ v.total_votos or 0 }} votos
+        </span>
       </div>
-      <div class="votacao-titulo">{{ v.titulo }}</div>
-      {% if v.descricao %}<div class="votacao-desc">{{ v.descricao }}</div>{% endif %}
-      <div class="votacao-meta">
-        <span> {{ v.qtd_urnas }} urnas</span>
-        <span> {{ v.qtd_contadores }} contadores</span>
-        {% if v.fim %}<span>⏱ Até {{ v.fim | fmt_dt }}</span>{% endif %}
+
+      <div class="votacao-titulo" style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">{{ v.titulo }}</div>
+      
+      {% if v.descricao %}
+        <div class="votacao-desc" style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.45; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">{{ v.descricao }}</div>
+      {% endif %}
+      
+      <div class="votacao-meta" style="display: flex; gap: 0.75rem; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; flex-wrap: wrap;">
+        <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+          {{ v.qtd_urnas }} Urnas
+        </span>
+        <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+          {{ v.qtd_contadores }} Contadores
+        </span>
+        {% if v.fim %}
+          <span style="display: inline-flex; align-items: center; gap: 0.25rem; color: var(--yellow);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Término: {{ v.fim | fmt_dt }}
+          </span>
+        {% endif %}
       </div>
+
     </a>
     {% endfor %}
   </div>
   {% else %}
-  <div class="glass-card text-center" style="padding:3rem;">
-    <div style="font-size:3rem;margin-bottom:1rem;"></div>
-    <h3 style="margin-bottom:0.5rem;">Nenhuma votação pública ainda</h3>
-    <p class="text-muted text-sm mb-2">Seja o primeiro a criar uma!</p>
+  <!-- Empty State -->
+  <div class="glass-card text-center" style="padding: 4rem 2rem; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px dashed var(--border); background: var(--bg-glass); border-radius: var(--radius-lg);">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-muted); margin-bottom: 1.25rem;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+    
+    <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary);">Nenhuma sessão pública ativa</h3>
+    <p class="text-muted text-sm" style="color: var(--text-secondary); max-width: 320px; margin: 0 auto 1.5rem; line-height: 1.5;">Não existem eleições públicas em andamento nesta rede distribuída no momento.</p>
+    
     {% if current_user.is_authenticated %}
-    <a href="{{ url_for('votacoes.criar') }}" class="btn btn-primary">+ Criar votação</a>
+    <a href="{{ url_for('votacoes.criar') }}" class="btn btn-primary" style="display: inline-flex; align-items: center; font-weight: 600;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.375rem;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Criar Votação
+    </a>
     {% else %}
-    <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Cadastrar-se</a>
+    <a href="{{ url_for('auth.register') }}" class="btn btn-primary" style="font-weight: 600;">Criar uma Conta</a>
     {% endif %}
   </div>
   {% endif %}

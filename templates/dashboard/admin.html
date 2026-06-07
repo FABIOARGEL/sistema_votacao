@@ -1,89 +1,97 @@
 {% extends "base.html" %}
-{% block title %}Painel Admin Global — VotoDistribuído{% endblock %}
+{% block title %}Painel de Controle Administrativo — VotoDistribuído{% endblock %}
+
 {% block content %}
-<div class="page">
-<div class="container">
-  <div class="flex-between mb-3" style="flex-wrap:wrap;gap:1rem;">
-    <div>
-      <h1 class="section-title" style="margin-bottom:0.25rem;"> Administração Global</h1>
-      <p class="text-muted text-sm">Visão geral de todos os processos e dados do sistema</p>
+<div class="page" style="padding: 3rem 1rem;">
+  <div class="container">
+    
+    <!-- Title Section -->
+    <div class="flex-between mb-3" style="flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1.5rem;">
+      <div>
+        <h1 class="section-title" style="margin-bottom: 0.25rem; font-size: 1.75rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--blue);"><path d="M12 22h9"/><path d="M3 20v-8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v8"/><path d="M3 12h18"/><path d="M14 2h6a2 2 0 0 1 2 2v10"/><path d="M14 6h3"/></svg>
+          Administração Global
+        </h1>
+        <p class="text-muted text-sm">Painel de gerenciamento, infraestrutura e auditoria global do sistema</p>
+      </div>
     </div>
-  </div>
 
-  <div class="stats-grid mb-3">
-    <div class="stat-card">
-      <span class="stat-label">Votações Totais / Ativas</span>
-      <span class="stat-value">{{ stats.total_votacoes }} / <span style="color:var(--green);">{{ stats.votacoes_ativas }}</span></span>
-      <span class="stat-icon"></span>
-    </div>
-    <div class="stat-card blue">
-      <span class="stat-label">Urnas / Contadores Online</span>
-      <span class="stat-value">{{ stats.urnas_online }} / {{ stats.conts_online }}</span>
-      <span class="stat-icon"></span>
-    </div>
-    <div class="stat-card green">
-      <span class="stat-label">Total Votos Processados</span>
-      <span class="stat-value">{{ stats.total_votos }}</span>
-      <span class="stat-icon"></span>
-    </div>
-    <div class="stat-card purple">
-      <span class="stat-label">Usuários Cadastrados</span>
-      <span class="stat-value">{{ stats.total_usuarios }}</span>
-      <span class="stat-icon"></span>
-    </div>
-  </div>
+    <!-- Admin Stats Grid -->
+    <div class="stats-grid mb-3" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; margin-bottom: 2rem;">
+      <div class="stat-card" style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; transition: var(--transition);">
+        <span class="stat-label" style="font-size: 0.7rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; letter-spacing: 0.05em;">Eleições Ativas / Totais</span>
+        <span class="stat-value" style="font-size: 2rem; font-weight: 700; color: var(--text-primary);">
+          <span style="color: var(--green);">{{ stats.votacoes_ativas }}</span> / {{ stats.total_votacoes }}
+        </span>
+        <div style="color: var(--text-muted); opacity: 0.15; position: absolute; bottom: 0.5rem; right: 0.5rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22h9"/><path d="M3 20v-8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v8"/><path d="M3 12h18"/><path d="M14 2h6a2 2 0 0 1 2 2v10"/><path d="M14 6h3"/></svg>
+        </div>
+      </div>
 
-  <div class="card mb-3">
-    <div class="card-header"><span class="card-title">Todas as Votações (Banco de Dados)</span></div>
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>ID MongoDB</th>
-            <th>Título</th>
-            <th>Status</th>
-            <th>Infra</th>
-            <th>Criador ID</th>
-            <th>Criação</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for v in votacoes %}
-          <tr>
-            <td><code>{{ v._id|objectid_str }}</code></td>
-            <td><a href="{{ url_for('votacoes.detalhe', vid=v._id|objectid_str) }}" style="color:var(--text-primary);font-weight:600;">{{ v.titulo }}</a></td>
-            <td><span class="badge {{ 'badge-green' if v.status=='ativa' else 'badge-purple' if v.status=='encerrada' else 'badge-yellow' }}">{{ v.status }}</span></td>
-            <td style="font-size:0.8rem;color:var(--text-muted);">U:{{ v.qtd_urnas }} C:{{ v.qtd_contadores }} | P:{{ v.porta_coordenador or 'N/A' }}</td>
-            <td style="font-size:0.8rem;"><code>{{ v.criador_id|objectid_str }}</code></td>
-            <td style="font-size:0.8rem;">{{ v.criada_em|fmt_dt }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
+      <div class="stat-card blue" style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; transition: var(--transition);">
+        <span class="stat-label" style="font-size: 0.7rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; letter-spacing: 0.05em;">Urnas / Contadores Online</span>
+        <span class="stat-value" style="font-size: 2rem; font-weight: 700; color: var(--blue);">
+          {{ stats.urnas_online }} / {{ stats.conts_online }}
+        </span>
+        <div style="color: var(--blue); opacity: 0.15; position: absolute; bottom: 0.5rem; right: 0.5rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+        </div>
+      </div>
 
-  <div class="grid-2" style="gap:1.5rem;">
-    <div class="card">
-      <div class="card-header"><span class="card-title">Processos Registrados (100+)</span></div>
-      <div class="table-container" style="max-height:400px;">
+      <div class="stat-card green" style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; transition: var(--transition);">
+        <span class="stat-label" style="font-size: 0.7rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; letter-spacing: 0.05em;">Votos Processados</span>
+        <span class="stat-value" style="font-size: 2rem; font-weight: 700; color: var(--green);">{{ stats.total_votos }}</span>
+        <div style="color: var(--green); opacity: 0.15; position: absolute; bottom: 0.5rem; right: 0.5rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+        </div>
+      </div>
+
+      <div class="stat-card purple" style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; transition: var(--transition);">
+        <span class="stat-label" style="font-size: 0.7rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; letter-spacing: 0.05em;">Contas Registradas</span>
+        <span class="stat-value" style="font-size: 2rem; font-weight: 700; color: var(--purple);">{{ stats.total_usuarios }}</span>
+        <div style="color: var(--purple); opacity: 0.15; position: absolute; bottom: 0.5rem; right: 0.5rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- MongoDB Polls Table -->
+    <div class="card mb-3" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); overflow: hidden; margin-bottom: 2rem;">
+      <div class="card-header" style="border-bottom: 1px solid var(--border-subtle); padding: 1.25rem 1.75rem;">
+        <span class="card-title" style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--blue);"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+          Sessões Eleitorais (Banco de Dados)
+        </span>
+      </div>
+      <div class="table-container" style="border: none; border-radius: 0;">
         <table>
-          <thead><tr><th>Porta</th><th>Tipo</th><th>Votação</th><th>Status</th></tr></thead>
-          <tbody>
-            {% for u in urnas %}
+          <thead>
             <tr>
-              <td><code>:{{ u.porta }}</code></td>
-              <td>Urna</td>
-              <td style="font-size:0.75rem;"><code>{{ u.votacao_id|objectid_str }}</code></td>
-              <td><span class="badge {{ 'badge-green' if u.status=='online' else 'badge-red' }}">{{ u.status }}</span></td>
+              <th style="padding: 0.75rem 1.25rem;">ID MongoDB</th>
+              <th style="padding: 0.75rem 1.25rem;">Título da Eleição</th>
+              <th style="padding: 0.75rem 1.25rem;">Status</th>
+              <th style="padding: 0.75rem 1.25rem;">Infraestrutura</th>
+              <th style="padding: 0.75rem 1.25rem;">Criador ID</th>
+              <th style="padding: 0.75rem 1.25rem;">Criação</th>
             </tr>
-            {% endfor %}
-            {% for c in conts %}
+          </thead>
+          <tbody>
+            {% for v in votacoes %}
             <tr>
-              <td><code>:{{ c.porta }}</code></td>
-              <td>Contador</td>
-              <td style="font-size:0.75rem;"><code>{{ c.votacao_id|objectid_str }}</code></td>
-              <td><span class="badge {{ 'badge-green' if c.status=='online' else 'badge-red' }}">{{ c.status }}</span></td>
+              <td style="padding: 0.875rem 1.25rem;"><code>{{ v._id|objectid_str }}</code></td>
+              <td style="padding: 0.875rem 1.25rem;">
+                <a href="{{ url_for('votacoes.detalhe', vid=v._id|objectid_str) }}" style="color: var(--text-primary); font-weight: 600; transition: var(--transition);" onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='var(--text-primary)'">{{ v.titulo }}</a>
+              </td>
+              <td style="padding: 0.875rem 1.25rem;">
+                <span class="badge {{ 'badge-green' if v.status=='ativa' else 'badge-purple' if v.status=='encerrada' else 'badge-yellow' }}" style="text-transform: uppercase; font-size: 0.65rem;">
+                  {{ v.status }}
+                </span>
+              </td>
+              <td style="padding: 0.875rem 1.25rem; font-size: 0.8rem; color: var(--text-muted);">
+                Urnas: <strong>{{ v.qtd_urnas }}</strong> · Cont: <strong>{{ v.qtd_contadores }}</strong> | Porta: <code>{{ v.porta_coordenador or 'N/A' }}</code>
+              </td>
+              <td style="padding: 0.875rem 1.25rem; font-size: 0.8rem;"><code>{{ v.criador_id|objectid_str }}</code></td>
+              <td style="padding: 0.875rem 1.25rem; font-size: 0.8rem; color: var(--text-muted);">{{ v.criada_em|fmt_dt }}</td>
             </tr>
             {% endfor %}
           </tbody>
@@ -91,23 +99,82 @@
       </div>
     </div>
 
-    <div class="card" style="display:flex;flex-direction:column;">
-      <div class="card-header"><span class="card-title">Logs Globais do Banco (100+)</span></div>
-      <div class="card-body" style="padding:0;flex:1;">
-        <div class="log-terminal" style="max-height:400px;border:none;border-radius:0;">
-          {% for l in logs %}
-          <div class="log-line">
-            <span class="log-time">{{ l.timestamp|fmt_dt }}</span>
-            <span class="log-badge {{ l.tipo }}">{{ l.tipo }}</span>
-            <span class="log-server">{{ l.servidor_id or 'sistema' }}</span>
-            <span class="log-msg">{{ l.mensagem }}</span>
-          </div>
-          {% endfor %}
+    <!-- Grid processes and logs -->
+    <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start;">
+      
+      <!-- Processes Registered -->
+      <div class="card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); overflow: hidden;">
+        <div class="card-header" style="border-bottom: 1px solid var(--border-subtle); padding: 1.25rem 1.75rem;">
+          <span class="card-title" style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--blue);"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+            Processos Ativos Provisionados (Portas TCP)
+          </span>
+        </div>
+        <div class="table-container" style="max-height: 400px; border: none; border-radius: 0;">
+          <table>
+            <thead>
+              <tr>
+                <th style="padding: 0.75rem 1.25rem;">Porta TCP</th>
+                <th style="padding: 0.75rem 1.25rem;">Tipo</th>
+                <th style="padding: 0.75rem 1.25rem;">Votação ID</th>
+                <th style="padding: 0.75rem 1.25rem;">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for u in urnas %}
+              <tr>
+                <td style="padding: 0.875rem 1.25rem;"><code>:{{ u.porta }}</code></td>
+                <td style="padding: 0.875rem 1.25rem; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; color: var(--text-primary);">Urna</td>
+                <td style="padding: 0.875rem 1.25rem; font-size: 0.75rem;"><code>{{ u.votacao_id|objectid_str }}</code></td>
+                <td style="padding: 0.875rem 1.25rem;">
+                  <span class="badge {{ 'badge-green' if u.status=='online' else 'badge-red' }}" style="text-transform: uppercase; font-size: 0.65rem;">
+                    {{ u.status }}
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+              
+              {% for c in conts %}
+              <tr>
+                <td style="padding: 0.875rem 1.25rem;"><code>:{{ c.porta }}</code></td>
+                <td style="padding: 0.875rem 1.25rem; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; color: var(--purple);">Contador</td>
+                <td style="padding: 0.875rem 1.25rem; font-size: 0.75rem;"><code>{{ c.votacao_id|objectid_str }}</code></td>
+                <td style="padding: 0.875rem 1.25rem;">
+                  <span class="badge {{ 'badge-green' if c.status=='online' else 'badge-red' }}" style="text-transform: uppercase; font-size: 0.65rem;">
+                    {{ c.status }}
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
       </div>
-    </div>
-  </div>
 
-</div>
+      <!-- Global audit logs from MongoDB -->
+      <div class="card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); overflow: hidden;">
+        <div class="card-header" style="border-bottom: 1px solid var(--border-subtle); padding: 1.25rem 1.75rem; background: rgba(245, 158, 11, 0.02);">
+          <span class="card-title" style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--yellow);"><polygon points="12 2 2 22 22 22 12 2"/></svg>
+            Histórico de Auditoria Geral (MongoDB)
+          </span>
+        </div>
+        <div class="card-body" style="padding: 0;">
+          <div class="log-terminal" style="max-height: 400px; background: #060913; border: none; border-radius: 0; padding: 1rem; overflow-y: auto; font-family: monospace; font-size: 0.75rem; color: #E2E8F0; scrollbar-width: thin;">
+            {% for l in logs %}
+            <div class="log-line" style="display: flex; gap: 0.5rem; align-items: baseline; padding: 0.25rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
+              <span class="log-time" style="color: var(--text-faint); font-size: 0.6875rem; flex-shrink: 0;">{{ l.timestamp|fmt_dt }}</span>
+              <span class="log-badge {{ l.tipo }}" style="flex-shrink: 0; font-size: 0.55rem; font-weight: 700; padding: 0.125rem 0.375rem; border-radius: 3px; text-transform: uppercase;">{{ l.tipo }}</span>
+              <span class="log-server" style="color: var(--text-muted); flex-shrink: 0; width: 90px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{ l.servidor_id or 'sistema' }}</span>
+              <span class="log-msg" style="color: var(--text-secondary); flex: 1;">{{ l.mensagem }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
 </div>
 {% endblock %}

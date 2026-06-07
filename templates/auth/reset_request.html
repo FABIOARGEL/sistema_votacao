@@ -1,22 +1,36 @@
 {% extends "base.html" %}
 {% block title %}Recuperar Senha — VotoDistribuído{% endblock %}
+
 {% block content %}
 <div class="auth-page">
   <div class="auth-card fade-in">
-    <h1 class="auth-title">Recuperar senha</h1>
-    <p class="auth-subtitle">Informe seu e-mail e geraremos um link de recuperação</p>
+    <h1 class="auth-title">Recuperar Credencial</h1>
+    <p class="auth-subtitle">Informe seu e-mail para restabelecer o acesso</p>
+    
     <form method="POST">
-      <div class="form-group">
-        <label for="email">E-mail cadastrado</label>
-        <input type="email" id="email" name="email" placeholder="seu@email.com" required>
+      <div class="form-group" style="margin-bottom: 1.5rem;">
+        <label for="email" style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600;">E-mail Cadastrado</label>
+        <input type="email" id="email" name="email" placeholder="nome@provedor.com" required style="width: 100%; padding: 0.75rem 1rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 0.875rem; transition: var(--transition);" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'">
       </div>
-      <button type="submit" class="btn btn-primary btn-full" id="btn-reset-request">Gerar link de recuperação</button>
+      
+      <button type="submit" class="btn btn-primary btn-full" id="btn-reset-request" style="padding: 0.75rem; font-weight: 600; font-size: 0.875rem; margin-bottom: 1rem;">
+        Gerar Token de Redefinição
+      </button>
     </form>
-    <p class="text-center mt-2" style="font-size:0.875rem; color:var(--text-secondary);">
-      <a href="{{ url_for('auth.login') }}" style="color:var(--blue); text-decoration:none;">← Voltar ao login</a>
+    
+    <p class="text-center" style="font-size: 0.875rem; text-align: center; margin-top: 1.25rem;">
+      <a href="{{ url_for('auth.login') }}" style="color: var(--blue); font-weight: 500; display: inline-flex; align-items: center; gap: 0.375rem;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Voltar para o Login
+      </a>
     </p>
-    <div class="alert alert-info mt-2" style="font-size:0.8rem;">
-      ℹ <strong>Modo acadêmico:</strong> O link de recuperação será exibido na tela (sem envio de e-mail real).
+
+    <!-- Professional info alert for local development -->
+    <div style="margin-top: 1.5rem; padding: 0.875rem 1rem; background: rgba(79, 140, 255, 0.05); border: 1px dashed rgba(79, 140, 255, 0.3); border-radius: var(--radius-sm); font-size: 0.75rem; color: var(--text-secondary); display: flex; gap: 0.625rem; align-items: flex-start;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--blue); flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <div>
+        <strong>Modo de Homologação:</strong> O token de redefinição de segurança será exibido diretamente na interface para simplificação do processo de auditoria.
+      </div>
     </div>
   </div>
 </div>

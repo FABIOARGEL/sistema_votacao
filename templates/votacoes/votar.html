@@ -1,63 +1,92 @@
 {% extends "base.html" %}
 {% block title %}Votar — {{ votacao.titulo }}{% endblock %}
+
 {% block content %}
-<div class="page">
-<div class="container-md">
-  <a href="{{ url_for('votacoes.detalhe', vid=votacao._id|objectid_str) }}" style="color:var(--text-muted);text-decoration:none;font-size:0.875rem;display:inline-block;margin-bottom:1rem;">← Voltar</a>
+<div class="page" style="padding: 3rem 1rem;">
+  <div class="container-md" style="max-width: 760px; margin: 0 auto;">
+    
+    <!-- Voltar link -->
+    <a href="{{ url_for('votacoes.detalhe', vid=votacao._id|objectid_str) }}" style="color: var(--text-muted); font-size: 0.875rem; display: inline-flex; align-items: center; gap: 0.375rem; margin-bottom: 1.5rem; transition: var(--transition);" onhover="this.style.color='var(--text-primary)'">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Cancelar e Voltar
+    </a>
 
-  <h1 class="section-title"> {{ votacao.titulo }}</h1>
-  {% if votacao.descricao %}<p class="section-subtitle">{{ votacao.descricao }}</p>{% endif %}
+    <!-- Header -->
+    <h1 class="section-title" style="font-size: 1.75rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--text-primary);">{{ votacao.titulo }}</h1>
+    {% if votacao.descricao %}
+      <p class="section-subtitle" style="color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.5;">{{ votacao.descricao }}</p>
+    {% endif %}
 
-  <div class="alert alert-info mb-3">
-    ℹ Selecione um candidato e confirme seu voto. Esta ação é <strong>irreversível</strong>.
-    Seu voto será enviado a uma urna via TCP e replicado aos contadores.
-  </div>
-
-  <form method="POST" action="{{ url_for('votacoes.votar', vid=votacao._id|objectid_str) }}" id="form-votar">
-    <div class="candidatos-grid" id="grid-candidatos">
-      {% for c in candidatos %}
-      <label class="candidato-card" for="cand-{{ c._id|objectid_str }}" id="label-{{ c._id|objectid_str }}"
-             onclick="selecionarCandidato('{{ c._id|objectid_str }}')">
-        <input type="radio" name="candidato_id" id="cand-{{ c._id|objectid_str }}"
-               value="{{ c._id|objectid_str }}" required>
-        <div class="candidato-check"></div>
-        <div class="candidato-numero">{{ c.numero }}</div>
-        <div class="candidato-nome">{{ c.nome }}</div>
-        {% if c.descricao %}<div class="candidato-desc">{{ c.descricao }}</div>{% endif %}
-      </label>
-      {% endfor %}
-    </div>
-
-    <!-- Info distribuída -->
-    <div class="card mt-3" style="border-color:rgba(79,142,247,0.3);">
-      <div class="card-body" style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
-        <div style="flex:1;">
-          <div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;margin-bottom:0.25rem;">Fluxo do voto</div>
-          <div style="font-family:monospace;font-size:0.8rem;color:var(--text-primary);">
-            Você → app.py → Coordenador → <span style="color:var(--blue)">Urna (round-robin)</span> → <span style="color:var(--green)">Contadores</span>
+    <!-- Candidate selection form -->
+    <form method="POST" action="{{ url_for('votacoes.votar', vid=votacao._id|objectid_str) }}" id="form-votar">
+      <div class="candidatos-grid" id="grid-candidatos" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.25rem;">
+        {% for c in candidatos %}
+        <label class="candidato-card" for="cand-{{ c._id|objectid_str }}" id="label-{{ c._id|objectid_str }}" onclick="selecionarCandidato('{{ c._id|objectid_str }}')" style="background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius-lg); padding: 2rem 1.25rem; text-align: center; cursor: pointer; transition: all var(--transition); position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; user-select: none;">
+          
+          <input type="radio" name="candidato_id" id="cand-{{ c._id|objectid_str }}" value="{{ c._id|objectid_str }}" required style="display: none;">
+          
+          <!-- Check Indicator -->
+          <div class="candidato-check">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-        </div>
-        <button type="submit" class="btn btn-primary btn-lg" id="btn-confirmar-voto" disabled>
-           Confirmar Voto
-        </button>
+          
+          <!-- Number badge -->
+          <div class="candidato-numero" style="display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: var(--bg-secondary); border: 2px solid var(--border); border-radius: 50%; font-family: 'Poppins', sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--blue); margin-bottom: 0.5rem; transition: var(--transition);">
+            {{ c.numero }}
+          </div>
+          
+          <div class="candidato-nome" style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary);">{{ c.nome }}</div>
+          
+          {% if c.descricao %}
+            <div class="candidato-desc" style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; margin-top: 0.25rem;">{{ c.descricao }}</div>
+          {% endif %}
+        </label>
+        {% endfor %}
       </div>
-    </div>
-  </form>
-</div>
+
+      <!-- Action Card & Network Flow info -->
+      <div class="card mt-3" style="border-color: rgba(79, 140, 255, 0.25); background: var(--bg-card); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); margin-top: 2rem; overflow: hidden;">
+        <div class="card-body" style="padding: 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap;">      
+          <button type="submit" class="btn btn-primary btn-lg" id="btn-confirmar-voto" disabled style="padding: 0.75rem 2rem; font-weight: 600; font-size: 0.875rem; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 0 20px rgba(79, 140, 255, 0.15);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 9.7a1 1 0 0 1-.68 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 .76-.97l8-2a1 1 0 0 1 .48 0l8 2A1 1 0 0 1 20 6z"/></svg>
+            Confirmar e Assinar
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
 function selecionarCandidato(id) {
-  document.querySelectorAll('.candidato-card').forEach(el => el.classList.remove('selecionado'));
-  document.getElementById('label-' + id).classList.add('selecionado');
+  document.querySelectorAll('.candidato-card').forEach(el => {
+    el.classList.remove('selecionado');
+    const num = el.querySelector('.candidato-numero');
+    if (num) {
+      num.style.borderColor = 'var(--border)';
+      num.style.color = 'var(--blue)';
+      num.style.background = 'var(--bg-secondary)';
+    }
+  });
+  
+  const selectedCard = document.getElementById('label-' + id);
+  selectedCard.classList.add('selecionado');
+  
+  const num = selectedCard.querySelector('.candidato-numero');
+  if (num) {
+    num.style.borderColor = 'var(--blue)';
+    num.style.color = '#FFF';
+    num.style.background = 'var(--blue)';
+  }
+  
   document.getElementById('btn-confirmar-voto').disabled = false;
 }
 
 document.getElementById('form-votar').addEventListener('submit', function(e) {
   const btn = document.getElementById('btn-confirmar-voto');
-  btn.innerHTML = '<div class="spinner"></div> Enviando à urna...';
+  btn.innerHTML = '<div class="spinner" style="margin-right:0.5rem;"></div> Transmitindo Cédula...';
   btn.disabled = true;
 });
 </script>

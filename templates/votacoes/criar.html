@@ -1,137 +1,159 @@
 {% extends "base.html" %}
 {% block title %}Criar Votação — VotoDistribuído{% endblock %}
+
 {% block content %}
-<div class="page">
-<div class="container-md">
-  <h1 class="section-title"> Nova Votação Distribuída</h1>
-  <p class="section-subtitle">Configure a infraestrutura distribuída da sua votação</p>
-
-  <form method="POST" action="{{ url_for('votacoes.criar') }}" id="form-criar-votacao">
-    <div class="grid-2">
-
-      <!-- Coluna Esquerda -->
-      <div style="display:flex;flex-direction:column;gap:1rem;">
-
-        <!-- Informações básicas -->
-        <div class="card">
-          <div class="card-header"><span class="card-title"> Informações Básicas</span></div>
-          <div class="card-body">
-            <div class="form-group">
-              <label for="titulo">Título da votação *</label>
-              <input type="text" id="titulo" name="titulo" placeholder="Ex: Eleição do Centro Acadêmico" required maxlength="120">
-            </div>
-            <div class="form-group">
-              <label for="descricao">Descrição</label>
-              <textarea id="descricao" name="descricao" placeholder="Descreva o objetivo desta votação..." rows="3"></textarea>
-            </div>
-            <div class="grid-2">
-              <div class="form-group">
-                <label for="inicio">Início</label>
-                <input type="datetime-local" id="inicio" name="inicio">
-              </div>
-              <div class="form-group">
-                <label for="fim">Término</label>
-                <input type="datetime-local" id="fim" name="fim">
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Acesso -->
-        <div class="card">
-          <div class="card-header"><span class="card-title"> Controle de Acesso</span></div>
-          <div class="card-body">
-            <div class="form-group">
-              <label class="form-check">
-                <input type="checkbox" name="publica" id="publica" checked>
-                <span>Votação pública (visível a todos)</span>
-              </label>
-            </div>
-            <div class="form-group">
-              <label for="senha_acesso">Senha de acesso (opcional)</label>
-              <input type="text" id="senha_acesso" name="senha_acesso" placeholder="Deixe vazio para sem senha">
-            </div>
-          </div>
-        </div>
-
+<div class="page" style="padding: 3rem 1rem;">
+  <div class="container-md" style="max-width: 960px; margin: 0 auto;">
+    
+    <!-- Title -->
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1.5rem;">
+      <div style="color: var(--blue); padding: 0.5rem; background: var(--blue-glow); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </div>
-
-      <!-- Coluna Direita -->
-      <div style="display:flex;flex-direction:column;gap:1rem;">
-
-        <!-- Infraestrutura distribuída -->
-        <div class="card" style="border-color:var(--blue);box-shadow:0 0 20px var(--blue-glow);">
-          <div class="card-header" style="background:var(--blue-glow);">
-            <span class="card-title"> Infraestrutura Distribuída</span>
-            <span class="badge badge-blue">Auto-gerada</span>
-          </div>
-          <div class="card-body">
-            <p class="text-muted text-sm mb-2">O sistema criará automaticamente processos independentes para esta votação.</p>
-
-            <div class="form-group">
-              <label for="qtd_urnas"> Quantidade de Urnas</label>
-              <input type="number" id="qtd_urnas" name="qtd_urnas" value="2" min="1" max="10" oninput="atualizarTopologia()">
-              <span class="text-muted text-sm">Cada urna é um processo TCP independente</span>
-            </div>
-            <div class="form-group">
-              <label for="qtd_contadores"> Quantidade de Contadores</label>
-              <input type="number" id="qtd_contadores" name="qtd_contadores" value="2" min="1" max="5" oninput="atualizarTopologia()">
-              <span class="text-muted text-sm">Contadores replicam votos entre si</span>
-            </div>
-
-            <!-- Preview topologia -->
-            <div style="background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-md);padding:1rem;margin-top:0.5rem;">
-              <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.75rem;font-weight:600;text-transform:uppercase;">Preview da Infraestrutura</div>
-              <div class="topology" id="topo-preview" style="padding:0.5rem;gap:0.5rem;">
-                <!-- Gerado por JS -->
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Info SD -->
-        <div class="card">
-          <div class="card-header"><span class="card-title">ℹ Como funciona</span></div>
-          <div class="card-body" style="font-size:0.8rem;color:var(--text-secondary);display:flex;flex-direction:column;gap:0.5rem;">
-            <div> <strong>Coordenador</strong> — gerencia toda a infraestrutura</div>
-            <div> <strong>Urnas</strong> — recebem votos, balanceamento round-robin</div>
-            <div> <strong>Contadores</strong> — replicam resultados entre si</div>
-            <div> <strong>Heartbeat</strong> — detecção automática de falhas a cada 5s</div>
-            <div> <strong>Replicação</strong> — Eleitor → Urna → Contador → Réplicas</div>
-          </div>
-        </div>
-
+      <div>
+        <h1 class="section-title" style="margin: 0; font-size: 1.75rem;">Nova Votação Distribuída</h1>
+        <p class="text-muted text-sm" style="margin-top: 0.25rem;">Provisione e configure os nós de processamento descentralizados para sua eleição</p>
       </div>
     </div>
 
-    <!-- Candidatos -->
-    <div class="card mt-2">
-      <div class="card-header">
-        <span class="card-title"> Candidatos / Opções de Voto</span>
-        <button type="button" class="btn btn-outline btn-sm" onclick="addCandidato()" id="btn-add-candidato">+ Adicionar</button>
-      </div>
-      <div class="card-body">
-        <div style="display:grid;grid-template-columns:70px 1fr 2fr auto;gap:0.5rem;margin-bottom:0.5rem;padding:0 0.25rem;">
-          <span class="text-muted text-sm" style="font-weight:600;">Nº</span>
-          <span class="text-muted text-sm" style="font-weight:600;">Nome *</span>
-          <span class="text-muted text-sm" style="font-weight:600;">Descrição</span>
-          <span></span>
-        </div>
-        <div id="candidatos-container">
-          <!-- Candidatos iniciais inseridos por JS -->
-        </div>
-        <p class="text-muted text-sm mt-1">Mínimo 2 candidatos/opções obrigatório.</p>
-      </div>
-    </div>
+    <form method="POST" action="{{ url_for('votacoes.criar') }}" id="form-criar-votacao">
+      <div class="grid-2" style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 2rem; align-items: start;">
 
-    <div class="flex-between mt-3" style="flex-wrap:wrap;gap:1rem;">
-      <a href="{{ url_for('votacoes.lista') }}" class="btn btn-ghost">← Cancelar</a>
-      <button type="submit" class="btn btn-primary btn-lg" id="btn-criar-votacao">
-         Criar Votação e Infraestrutura
-      </button>
-    </div>
-  </form>
-</div>
+        <!-- Left Column -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+
+          <!-- Informações básicas -->
+          <div class="card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+            <div class="card-header" style="border-bottom: 1px solid var(--border-subtle); padding: 1.25rem 1.75rem;">
+              <span class="card-title" style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--blue);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                Informações Básicas
+              </span>
+            </div>
+            <div class="card-body" style="padding: 1.75rem;">
+              <div class="form-group" style="margin-bottom: 1.25rem;">
+                <label for="titulo" style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600;">Título da Sessão *</label>
+                <input type="text" id="titulo" name="titulo" placeholder="Ex: Assembleia Geral Extraordinária 2026" required maxlength="120" style="width: 100%; padding: 0.75rem 1rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 0.875rem; transition: var(--transition);" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'">
+              </div>
+              
+              <div class="form-group" style="margin-bottom: 1.25rem;">
+                <label for="descricao" style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600;">Descrição / Pauta</label>
+                <textarea id="descricao" name="descricao" placeholder="Descreva os objetivos, pautas ou diretrizes desta votação..." rows="3" style="width: 100%; padding: 0.75rem 1rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 0.875rem; transition: var(--transition); resize: vertical;" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+              </div>
+              
+              <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                  <label for="inicio" style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600;">Data/Hora de Início</label>
+                  <input type="datetime-local" id="inicio" name="inicio" style="width: 100%; padding: 0.75rem 1rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 0.875rem; transition: var(--transition);" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'">
+                </div>
+                <div class="form-group">
+                  <label for="fim" style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600;">Data/Hora de Término</label>
+                  <input type="datetime-local" id="fim" name="fim" style="width: 100%; padding: 0.75rem 1rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 0.875rem; transition: var(--transition);" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Acesso -->
+          <div class="card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+            <div class="card-header" style="border-bottom: 1px solid var(--border-subtle); padding: 1.25rem 1.75rem;">
+              <span class="card-title" style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--blue);"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Controle de Segurança e Acesso
+              </span>
+            </div>
+            <div class="card-body" style="padding: 1.75rem;">
+              <div class="form-group" style="margin-bottom: 1.25rem;">
+                <label class="form-check" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">
+                  <input type="checkbox" name="publica" id="publica" checked style="accent-color: var(--blue); width: 16px; height: 16px;">
+                  <span style="font-size: 0.875rem; color: var(--text-secondary);">Disponibilizar votação publicamente</span>
+                </label>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="senha_acesso" style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600;">Código de Acesso Exclusivo (Opcional)</label>
+                <input type="text" id="senha_acesso" name="senha_acesso" placeholder="Deixe em branco para permitir acesso livre" style="width: 100%; padding: 0.75rem 1rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 0.875rem; transition: var(--transition);" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'">
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+
+          <!-- Infraestrutura distribuída -->
+          <div class="card" style="border-color: var(--blue); box-shadow: 0 0 24px var(--blue-glow); background: var(--bg-card); border-radius: var(--radius-lg);">
+            <div class="card-header" style="background: rgba(79, 140, 255, 0.06); border-bottom: 1px solid rgba(79, 140, 255, 0.15); padding: 1.25rem 1.75rem; display: flex; justify-content: space-between; align-items: center;">
+              <span class="card-title" style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--blue);"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                Arquitetura de Processos
+              </span>
+              <span class="badge badge-blue" style="font-size: 0.65rem; background: var(--blue-glow); border: 1px solid var(--blue); color: var(--blue);">AUTO-SPAWN</span>
+            </div>
+            <div class="card-body" style="padding: 1.75rem;">
+              <p class="text-muted text-sm" style="color: var(--text-secondary); line-height: 1.5; margin-bottom: 1.5rem;">
+                Mapeamento sob demanda de servidores e contadores autônomos em portas locais exclusivas.
+              </p>
+
+              <div class="form-group" style="margin-bottom: 1.25rem;">
+                <label for="qtd_urnas" style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600;">Nós de Ingestão (Urnas)</label>
+                <input type="number" id="qtd_urnas" name="qtd_urnas" value="2" min="1" max="10" oninput="atualizarTopologia()" style="width: 100%; padding: 0.75rem 1rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 0.875rem; transition: var(--transition);">
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.35rem;">Quantidade de portas alocadas em paralelo (8001-8010)</div>
+              </div>
+              
+              <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label for="qtd_contadores" style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600;">Nós de Consenso (Contadores)</label>
+                <input type="number" id="qtd_contadores" name="qtd_contadores" value="2" min="1" max="5" oninput="atualizarTopologia()" style="width: 100%; padding: 0.75rem 1rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 0.875rem; transition: var(--transition);">
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.35rem;">Nós responsáveis por replicação síncrona (9001-9005)</div>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+
+      <!-- Candidatos -->
+      <div class="card mt-3" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+        <div class="card-header" style="border-bottom: 1px solid var(--border-subtle); padding: 1.25rem 1.75rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+          <span class="card-title" style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--blue);"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Opções de Voto / Candidatos
+          </span>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="addCandidato()" id="btn-add-candidato" style="border: 1px solid var(--border); font-size: 0.8125rem; font-weight: 500; display: inline-flex; align-items: center; gap: 0.375rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Adicionar Opção
+          </button>
+        </div>
+        <div class="card-body" style="padding: 1.75rem;">
+          <div style="display: grid; grid-template-columns: 80px 1.5fr 2.5fr 60px; gap: 1rem; margin-bottom: 0.75rem; padding: 0 0.5rem;">
+            <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Número</span>
+            <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Nome do Candidato *</span>
+            <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Descrição / Proposta</span>
+            <span></span>
+          </div>
+          
+          <div id="candidatos-container" style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <!-- Dyn JS -->
+          </div>
+          
+          <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 1rem;">* Obrigatoriedade mínima de pelo menos duas (2) opções ativas para consistência da cédula.</p>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex-between mt-3" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem;">
+        <a href="{{ url_for('votacoes.lista') }}" class="btn btn-ghost" style="border: 1px solid var(--border); font-size: 0.875rem; display: inline-flex; align-items: center; gap: 0.375rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Voltar para Votações
+        </a>
+        <button type="submit" class="btn btn-primary btn-lg" id="btn-criar-votacao" style="box-shadow: 0 0 20px rgba(79, 140, 255, 0.3); font-weight: 600; padding: 0.875rem 1.75rem;">
+          Provisionar & Iniciar Votação
+        </button>
+      </div>
+    </form>
+
+  </div>
 </div>
 {% endblock %}
 
@@ -146,46 +168,81 @@ function addCandidato(nome='', numero='', desc='') {
   const div = document.createElement('div');
   div.className = 'candidato-form-item';
   div.id = `cand-${contCand}`;
+  
+  // Custom styles for candidate inputs to match design token inputs
+  div.style.display = 'grid';
+  div.style.gridTemplateColumns = '80px 1.5fr 2.5fr 60px';
+  div.style.gap = '1rem';
+  div.style.alignItems = 'center';
+  div.style.background = 'var(--bg-secondary)';
+  div.style.border = '1px solid var(--border)';
+  div.style.borderRadius = 'var(--radius-sm)';
+  div.style.padding = '0.75rem';
+  
   div.innerHTML = `
-    <input type="number" name="candidato_numero[]" value="${n}" min="1" placeholder="Nº" style="text-align:center;">
-    <input type="text" name="candidato_nome[]" value="${nome}" placeholder="Nome do candidato" required>
-    <input type="text" name="candidato_desc[]" value="${desc}" placeholder="Descrição opcional">
-    <button type="button" onclick="this.closest('.candidato-form-item').remove();atualizarTopologia();"
-      class="btn btn-danger btn-sm" style="padding:0.4rem 0.6rem;"></button>
+    <input type="number" name="candidato_numero[]" value="${n}" min="1" placeholder="Nº" style="text-align: center; width: 100%; padding: 0.5625rem 0.5rem; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 0.875rem;">
+    <input type="text" name="candidato_nome[]" value="${nome}" placeholder="Ex: Chapa 01" required style="width: 100%; padding: 0.5625rem 0.75rem; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 0.875rem;">
+    <input type="text" name="candidato_desc[]" value="${desc}" placeholder="Ex: Pelo avanço e transparência das pautas" style="width: 100%; padding: 0.5625rem 0.75rem; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 0.875rem;">
+    <button type="button" onclick="this.closest('.candidato-form-item').remove(); atualizarTopologia();" class="btn btn-ghost" style="padding: 0.5625rem; border: 1px solid rgba(239, 68, 68, 0.2); color: var(--red); display: flex; align-items: center; justify-content: center; min-width: unset; width: 100%; height: 38px;" title="Remover Candidato">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+    </button>
   `;
   container.appendChild(div);
   atualizarTopologia();
 }
 
 function atualizarTopologia() {
-  const urnas = Math.max(1, parseInt(document.getElementById('qtd_urnas').value)||1);
-  const conts = Math.max(1, parseInt(document.getElementById('qtd_contadores').value)||1);
+  const urnas = Math.max(1, parseInt(document.getElementById('qtd_urnas').value) || 1);
+  const conts = Math.max(1, parseInt(document.getElementById('qtd_contadores').value) || 1);
   const preview = document.getElementById('topo-preview');
 
-  let html = `<div class="server-card online" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.4rem 0.8rem;">
-    <span class="server-dot online"></span><span style="font-size:0.75rem;font-weight:700;"> Coordenador</span>
-  </div>
-  <div class="topo-line"></div>
-  <div class="topology-row">`;
-  for (let i=0;i<urnas;i++) html += `<div class="server-card online" style="min-width:80px;padding:0.5rem;">
-    <div class="server-dot online"></div><div class="server-name" style="font-size:0.7rem;">Urna ${i+1}</div></div>`;
-  html += `</div><div class="topo-line"></div><div class="topology-row">`;
-  for (let i=0;i<conts;i++) html += `<div class="server-card online" style="min-width:90px;padding:0.5rem;border-color:var(--green);">
-    <div class="server-dot online"></div><div class="server-name" style="font-size:0.7rem;">Contador ${i+1}</div></div>`;
-  html += `</div><div style="font-size:0.7rem;color:var(--text-muted);margin-top:0.5rem;">
-    Total: ${1 + urnas + conts} processos independentes</div>`;
+  let html = `
+    <div class="server-card online" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--blue-muted); border: 1px solid var(--blue); border-radius: var(--radius-md); min-width: 140px; justify-content: center;">
+      <span class="server-dot online" style="width: 6px; height: 6px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 6px var(--blue); display: inline-block;"></span>
+      <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.025em;">Coordenador</span>
+    </div>
+    <div class="topo-line" style="width: 1px; height: 16px; background: var(--border);"></div>
+    <div class="topology-row" style="display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">`;
+    
+  for (let i = 0; i < urnas; i++) {
+    html += `
+      <div class="server-card online" style="min-width: 70px; padding: 0.375rem 0.5rem; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-sm); text-align: center;">
+        <span class="server-dot online" style="width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 4px var(--green); display: inline-block; margin-bottom: 2px;"></span>
+        <div class="server-name" style="font-size: 0.65rem; font-weight: 600; color: var(--text-secondary);">Urna ${i+1}</div>
+      </div>`;
+  }
+  
+  html += `
+    </div>
+    <div class="topo-line" style="width: 1px; height: 16px; background: var(--border);"></div>
+    <div class="topology-row" style="display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">`;
+    
+  for (let i = 0; i < conts; i++) {
+    html += `
+      <div class="server-card online" style="min-width: 80px; padding: 0.375rem 0.5rem; background: var(--bg-elevated); border: 1px solid var(--purple); border-radius: var(--radius-sm); text-align: center;">
+        <span class="server-dot online" style="width: 6px; height: 6px; border-radius: 50%; background: var(--purple); box-shadow: 0 0 4px var(--purple); display: inline-block; margin-bottom: 2px;"></span>
+        <div class="server-name" style="font-size: 0.65rem; font-weight: 600; color: var(--text-secondary);">Contador ${i+1}</div>
+      </div>`;
+  }
+  
+  html += `
+    </div>
+    <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.5rem; text-align: center; font-weight: 500;">
+      Total: ${1 + urnas + conts} processos autônomos provisionados
+    </div>`;
+    
   preview.innerHTML = html;
 }
 
-// Inicializar
-addCandidato('Candidato A','1','');
-addCandidato('Candidato B','2','');
+// Init candidates
+addCandidato('Opção Favorável (Sim)', '1', 'Aprovação total dos termos propostos');
+addCandidato('Opção Contrárria (Não)', '2', 'Rejeição total dos termos propostos');
 atualizarTopologia();
 
-// Confirmar envio
+// Spinner on submit
 document.getElementById('form-criar-votacao').addEventListener('submit', function(e) {
   const btn = document.getElementById('btn-criar-votacao');
-  btn.innerHTML = '<div class="spinner"></div> Criando infraestrutura...';
+  btn.innerHTML = '<div class="spinner" style="margin-right: 0.5rem;"></div> Inicializando Infraestrutura...';
   btn.disabled = true;
 });
 </script>

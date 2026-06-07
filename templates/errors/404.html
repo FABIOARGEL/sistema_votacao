@@ -1,14 +1,24 @@
 {% extends "base.html" %}
-
-{% block title %}Página Não Encontrada - VotoDistribuído{% endblock %}
+{% block title %}Página Não Encontrada — VotoDistribuído{% endblock %}
 
 {% block content %}
-<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center; padding: 2rem;">
-    <h1 style="font-size: 6rem; margin-bottom: 0; color: var(--primary);">404</h1>
-    <h2 style="font-size: 2rem; margin-bottom: 1rem; color: var(--text-primary);">Página Não Encontrada</h2>
-    <p style="color: var(--text-secondary); max-width: 500px; margin-bottom: 2rem;">
-        A página que você está procurando não existe, foi movida ou está temporariamente indisponível.
+<div class="page" style="display: flex; align-items: center; justify-content: center; padding: 4rem 1rem;">
+  <div class="container-sm" style="max-width: 480px; text-align: center;">
+    
+    <div style="width: 80px; height: 80px; border-radius: var(--radius-md); background: rgba(79, 140, 255, 0.05); border: 1px solid rgba(79, 140, 255, 0.2); display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem; color: var(--blue); box-shadow: var(--shadow-glow);">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+    </div>
+    
+    <h1 style="font-size: 5rem; font-weight: 800; line-height: 1; margin-bottom: 0.5rem; background: linear-gradient(135deg, #FFF 0%, var(--border) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">404</h1>
+    <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-primary);">Página Não Encontrada</h2>
+    <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5; margin-bottom: 2rem;">
+      O recurso solicitado ou a rota de rede especificada não pôde ser localizado nos servidores da rede distribuída.
     </p>
-    <a href="{{ url_for('index') }}" class="btn btn-primary" style="padding: 0.75rem 1.5rem; font-size: 1rem;">Voltar para o Início</a>
+    
+    <a href="{{ url_for('index') }}" class="btn btn-primary" style="padding: 0.75rem 1.75rem; font-weight: 600; font-size: 0.875rem; display: inline-flex; align-items: center; gap: 0.375rem; box-shadow: 0 0 20px rgba(79, 140, 255, 0.2);">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Voltar para o Início
+    </a>
+  </div>
 </div>
 {% endblock %}

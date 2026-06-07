@@ -1,161 +1,235 @@
 {% extends "base.html" %}
 {% block title %}{{ votacao.titulo }} — VotoDistribuído{% endblock %}
+
 {% block content %}
-<div class="page">
-<div class="container">
+<div class="page" style="padding: 3rem 1rem;">
+  <div class="container" style="max-width: 1200px; margin: 0 auto;">
 
-  <!-- Cabeçalho -->
-  <div class="flex-between mb-3" style="flex-wrap:wrap;gap:1rem;align-items:flex-start;">
-    <div>
-      <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.5rem;flex-wrap:wrap;">
-        <span class="badge {{ 'badge-green' if votacao.status=='ativa' else 'badge-purple' if votacao.status=='encerrada' else 'badge-yellow' }}">
-          {{ votacao.status | fmt_status }}
-        </span>
-        {% if not votacao.publica %}<span class="badge badge-red"> Privada</span>{% endif %}
-        {% if is_criador %}<span class="badge badge-blue">Criador</span>{% endif %}
-      </div>
-      <h1 style="font-size:1.75rem;font-weight:800;margin-bottom:0.25rem;">{{ votacao.titulo }}</h1>
-      {% if votacao.descricao %}<p class="text-muted">{{ votacao.descricao }}</p>{% endif %}
-      <div style="display:flex;gap:1.5rem;flex-wrap:wrap;margin-top:0.5rem;font-size:0.8rem;color:var(--text-muted);">
-        {% if votacao.inicio %}<span>▶ {{ votacao.inicio | fmt_dt }}</span>{% endif %}
-        {% if votacao.fim %}<span>⏹ {{ votacao.fim | fmt_dt }}</span>{% endif %}
-        <span> {{ total_votos }} votos</span>
-      </div>
-    </div>
-    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
-      {% if votacao.status == 'ativa' and current_user.is_authenticated and not ja_votou %}
-        <a href="{{ url_for('votacoes.votar', vid=votacao._id|objectid_str) }}" class="btn btn-primary btn-lg" id="btn-votar-agora">
-           Votar Agora
-        </a>
-      {% endif %}
-      {% if is_criador %}
-        <a href="{{ url_for('dashboard.votacao_detail', vid=votacao._id|objectid_str) }}" class="btn btn-ghost"> Dashboard</a>
-        {% if votacao.status == 'ativa' %}
-        <form method="POST" action="{{ url_for('votacoes.encerrar', vid=votacao._id|objectid_str) }}" style="display:inline;" onsubmit="return confirm('Encerrar votação?')">
-          <button type="submit" class="btn btn-danger" id="btn-encerrar-votacao">⏹ Encerrar</button>
-        </form>
-        {% endif %}
-      {% endif %}
-      <a href="{{ url_for('votacoes.lista') }}" class="btn btn-ghost">← Voltar</a>
-    </div>
-  </div>
-
-  <div class="grid-2" style="gap:1.5rem;">
-
-    <!-- Coluna principal -->
-    <div style="display:flex;flex-direction:column;gap:1.5rem;">
-
-      <!-- Resultado / votação -->
-      {% if ja_votou %}
-      <div class="alert alert-success"> Você já votou nesta eleição. Acompanhe os resultados abaixo.</div>
-      {% elif not current_user.is_authenticated %}
-      <div class="alert alert-info">ℹ <a href="{{ url_for('auth.login') }}" style="color:inherit;font-weight:600;">Faça login</a> para participar desta votação.</div>
-      {% elif votacao.status != 'ativa' %}
-      <div class="alert alert-warning"> Esta votação não está ativa.</div>
-      {% endif %}
-
-      <!-- Candidatos e resultados -->
-      <div class="card">
-        <div class="card-header">
-          <span class="card-title"> Candidatos & Resultados</span>
-          <span class="text-muted text-sm" id="total-votos-display">{{ total_votos }} votos</span>
+    <!-- Cabeçalho / Header -->
+    <div class="flex-between mb-3" style="flex-wrap: wrap; gap: 1.5rem; align-items: flex-start; border-bottom: 1px solid var(--border-subtle); padding-bottom: 2rem;">
+      <div>
+        <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap;">
+          <span class="badge {{ 'badge-green' if votacao.status=='ativa' else 'badge-purple' if votacao.status=='encerrada' else 'badge-yellow' }}" style="text-transform: uppercase; font-size: 0.65rem;">
+            {{ votacao.status | fmt_status }}
+          </span>
+          {% if not votacao.publica %}
+            <span class="badge badge-red" style="font-size: 0.65rem; display: inline-flex; align-items: center; gap: 0.25rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Sessão Privada
+            </span>
+          {% endif %}
+          {% if is_criador %}
+            <span class="badge badge-blue" style="font-size: 0.65rem; display: inline-flex; align-items: center; gap: 0.25rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Coordenador
+            </span>
+          {% endif %}
         </div>
-        <div class="card-body" id="resultados-container">
-          {% for item in contagem_display %}
-          <div class="resultado-bar" id="res-{{ loop.index }}">
-            <div class="resultado-bar-header">
-              <span class="resultado-nome">
-                <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:50%;font-size:0.75rem;font-weight:800;margin-right:0.5rem;">{{ item.candidato.numero }}</span>
-                {{ item.candidato.nome }}
-              </span>
-              <div style="text-align:right;">
-                <span style="font-weight:700;font-size:1rem;">{{ item.votos }}</span>
-                <span class="text-muted text-sm"> votos</span>
-                <span class="badge badge-blue" style="margin-left:0.25rem;">{{ item.pct }}%</span>
+        
+        <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--text-primary);">{{ votacao.titulo }}</h1>
+        {% if votacao.descricao %}
+          <p class="text-muted" style="color: var(--text-secondary); max-width: 700px; line-height: 1.5; font-size: 0.95rem;">{{ votacao.descricao }}</p>
+        {% endif %}
+        
+        <div style="display: flex; gap: 1.25rem; flex-wrap: wrap; margin-top: 1rem; font-size: 0.78rem; color: var(--text-muted);">
+          {% if votacao.inicio %}
+            <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Início: {{ votacao.inicio | fmt_dt }}
+            </span>
+          {% endif %}
+          {% if votacao.fim %}
+            <span style="display: inline-flex; align-items: center; gap: 0.25rem; color: var(--yellow);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Prazo Final: {{ votacao.fim | fmt_dt }}
+            </span>
+          {% endif %}
+          <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+            Auditoria: <span id="total-votos-top-count">{{ total_votos }}</span> votos confirmados
+          </span>
+        </div>
+      </div>
+      
+      <!-- Actions buttons -->
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        {% if votacao.status == 'ativa' and current_user.is_authenticated and not ja_votou %}
+          <a href="{{ url_for('votacoes.votar', vid=votacao._id|objectid_str) }}" class="btn btn-primary btn-lg" id="btn-votar-agora" style="box-shadow: 0 0 20px rgba(79, 140, 255, 0.3); font-weight: 600; font-size: 0.875rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.375rem;"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            Votar Agora
+          </a>
+        {% endif %}
+        
+        {% if is_criador %}
+          <a href="{{ url_for('dashboard.votacao_detail', vid=votacao._id|objectid_str) }}" class="btn btn-ghost" style="border: 1px solid var(--border); font-size: 0.8125rem; font-weight: 500; display: inline-flex; align-items: center; gap: 0.375rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+            Painel Geral
+          </a>
+          {% if votacao.status == 'ativa' %}
+            <form method="POST" action="{{ url_for('votacoes.encerrar', vid=votacao._id|objectid_str) }}" style="display: inline;" onsubmit="return confirm('Tem certeza de que deseja encerrar permanentemente esta votação e desalocar a infraestrutura?')">
+              <button type="submit" class="btn btn-ghost" id="btn-encerrar-votacao" style="border: 1px solid rgba(239, 68, 68, 0.2); color: var(--red); font-size: 0.8125rem; font-weight: 500; display: inline-flex; align-items: center; gap: 0.375rem; height: 38px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>
+                Encerrar Eleição
+              </button>
+            </form>
+          {% endif %}
+        {% endif %}
+        
+        <a href="{{ url_for('votacoes.lista') }}" class="btn btn-ghost" style="border: 1px solid var(--border); font-size: 0.8125rem; display: inline-flex; align-items: center; gap: 0.375rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Voltar
+        </a>
+      </div>
+    </div>
+
+    <!-- Main Grid Content -->
+    <div class="grid-2" style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 2rem; align-items: start;">
+
+      <!-- Left Column: Core Voting Progress -->
+      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        
+        {% if ja_votou %}
+          <div style="padding: 1rem 1.25rem; background: rgba(34, 197, 94, 0.05); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: var(--radius-md); font-size: 0.875rem; color: #86EFAC; display: flex; align-items: center; gap: 0.625rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Assinatura digital confirmada. Seu voto foi contabilizado com sucesso no livro de consenso.
+          </div>
+        {% elif not current_user.is_authenticated %}
+          <div style="padding: 1rem 1.25rem; background: rgba(79, 140, 255, 0.05); border: 1px solid rgba(79, 140, 255, 0.2); border-radius: var(--radius-md); font-size: 0.875rem; color: #93C5FD; display: flex; align-items: center; gap: 0.625rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span>Para participar desta sessão de votação, realize a <a href="{{ url_for('auth.login') }}" style="color: var(--blue); font-weight: 600; text-decoration: underline;">autenticação de eleitor</a>.</span>
+          </div>
+        {% elif votacao.status != 'ativa' %}
+          <div style="padding: 1rem 1.25rem; background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: var(--radius-md); font-size: 0.875rem; color: #FDE68A; display: flex; align-items: center; gap: 0.625rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Esta eleição foi dada como finalizada. A urna de votos está encerrada para novos envios.
+          </div>
+        {% endif %}
+
+        <!-- Candidatos e resultados -->
+        <div class="card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+          <div class="card-header" style="border-bottom: 1px solid var(--border-subtle); padding: 1.25rem 1.75rem; display: flex; justify-content: space-between; align-items: center;">
+            <span class="card-title" style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--blue);"><path d="M12 20h9"/><path d="M3 20v-8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v8"/><path d="M3 12h18"/><path d="M14 2h6a2 2 0 0 1 2 2v10"/><path d="M14 6h3"/></svg>
+              Opções & Contagem Provisória
+            </span>
+            <span class="text-muted text-sm" id="total-votos-display" style="font-weight: 600; color: var(--text-secondary);">{{ total_votos }} votos</span>
+          </div>
+          
+          <div class="card-body" id="resultados-container" style="padding: 1.75rem; display: flex; flex-direction: column; gap: 1.25rem;">
+            {% for item in contagem_display %}
+            <div class="resultado-bar" id="res-{{ loop.index }}" style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.25rem; transition: var(--transition);">
+              <div class="resultado-bar-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                <span class="resultado-nome" style="font-weight: 600; font-size: 0.9rem; color: var(--text-primary); display: inline-flex; align-items: center;">
+                  <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: linear-gradient(135deg, var(--blue) 0%, var(--purple) 100%); border-radius: 50%; font-size: 0.75rem; font-weight: 800; margin-right: 0.75rem; color: #FFF; box-shadow: 0 0 10px var(--blue-glow);">{{ item.candidato.numero }}</span>
+                  {{ item.candidato.nome }}
+                </span>
+                
+                <div style="text-align: right; display: flex; align-items: center; gap: 0.5rem;">
+                  <span style="font-weight: 700; font-size: 1rem; color: var(--text-primary);">{{ item.votos }}</span>
+                  <span class="text-muted text-sm" style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">votos</span>
+                  <span class="badge badge-blue" style="margin-left: 0.25rem; font-size: 0.7rem; background: var(--blue-glow); border: 1px solid var(--blue); color: var(--blue);">{{ item.pct }}%</span>
+                </div>
+              </div>
+              
+              {% if item.candidato.descricao %}
+                <p class="text-muted text-sm" style="color: var(--text-secondary); margin-bottom: 0.75rem; line-height: 1.4; padding-left: 2.5rem;">{{ item.candidato.descricao }}</p>
+              {% endif %}
+              
+              <div style="padding-left: 2.5rem;">
+                <div class="resultado-track" style="background: var(--bg-primary); border-radius: var(--radius-full); height: 6px; overflow: hidden; width: 100%;">
+                  <div class="resultado-fill" style="width: {{ item.pct }}%; height: 100%; border-radius: var(--radius-full); transition: width 0.6s var(--ease); min-width: 2px;"
+                       data-candidato="{{ item.candidato._id|objectid_str }}"
+                       data-pct="{{ item.pct }}"></div>
+                </div>
               </div>
             </div>
-            {% if item.candidato.descricao %}
-            <p class="text-muted text-sm mb-1">{{ item.candidato.descricao }}</p>
-            {% endif %}
-            <div class="resultado-track">
-              <div class="resultado-fill" style="width:{{ item.pct }}%;"
-                   data-candidato="{{ item.candidato._id|objectid_str }}"
-                   data-pct="{{ item.pct }}"></div>
-            </div>
+            {% endfor %}
           </div>
-          {% endfor %}
         </div>
+
       </div>
 
+      <!-- Right Column: Infrastructure & Realtime Audit -->
+      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        
+        <!-- Status urnas -->
+        <div class="card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+          <div class="card-header" style="border-bottom: 1px solid var(--border-subtle); padding: 1.25rem 1.75rem; display: flex; justify-content: space-between; align-items: center;">
+            <span class="card-title" style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--green);"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+              Servidores de Urna
+            </span>
+            <span class="badge badge-green" id="badge-urnas-online" style="text-transform: uppercase; font-size: 0.65rem;">
+              {{ urnas | selectattr('status','eq','online') | list | length }} ONLINE
+            </span>
+          </div>
+          <div class="card-body" style="padding: 1.5rem 1.75rem;">
+            <div class="server-grid" id="grid-urnas" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0.75rem;">
+              {% for u in urnas %}
+              <div class="server-card {{ u.status }}" id="urna-{{ u.porta }}" style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.875rem; text-align: center; position: relative; transition: border-color var(--transition);">
+                <div class="server-dot {{ u.status }}" style="width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-bottom: 0.375rem;"></div>
+                <div class="server-name" style="font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Urna</div>
+                <div class="server-port" style="font-family: monospace; font-size: 0.7rem; color: var(--text-secondary);">:{{ u.porta }}</div>
+                <div class="server-votes" style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary); margin-top: 0.25rem;">{{ u.votos_recebidos or 0 }}</div>
+                <div style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.02em;">votos</div>
+              </div>
+              {% else %}
+              <p class="text-muted text-sm" style="grid-column: 1 / -1; text-align: center;">Aguardando provisionamento da topologia...</p>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Status contadores -->
+        <div class="card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+          <div class="card-header" style="border-bottom: 1px solid var(--border-subtle); padding: 1.25rem 1.75rem; display: flex; justify-content: space-between; align-items: center;">
+            <span class="card-title" style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--purple);"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+              Servidores de Consenso
+            </span>
+            <span class="badge badge-blue" id="badge-cont-online" style="text-transform: uppercase; font-size: 0.65rem;">
+              {{ contadores | selectattr('status','eq','online') | list | length }} ONLINE
+            </span>
+          </div>
+          <div class="card-body" style="padding: 1.5rem 1.75rem;">
+            <div class="server-grid" id="grid-contadores" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0.75rem;">
+              {% for c in contadores %}
+              <div class="server-card {{ c.status }}" id="cont-{{ c.porta }}" style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.875rem; text-align: center; position: relative; transition: border-color var(--transition);">
+                <div class="server-dot {{ c.status }}" style="width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-bottom: 0.375rem;"></div>
+                <div class="server-name" style="font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Contador</div>
+                <div class="server-port" style="font-family: monospace; font-size: 0.7rem; color: var(--text-secondary);">:{{ c.porta }}</div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Logs em tempo real -->
+        <div class="card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); overflow: hidden;">
+          <div class="card-header" style="border-bottom: 1px solid var(--border-subtle); padding: 1.25rem 1.75rem; display: flex; justify-content: space-between; align-items: center; background: rgba(245, 158, 11, 0.02);">
+            <span class="card-title" style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--yellow);"><polygon points="12 2 2 22 22 22 12 2"/></svg>
+              Logs de Consenso IPC
+            </span>
+            <span class="badge badge-yellow" id="badge-live" style="font-size: 0.65rem; background: var(--yellow-glow); border: 1px solid var(--yellow); color: var(--yellow); letter-spacing: 0.04em;">AO VIVO</span>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <div class="log-terminal" id="log-terminal" style="background: #060913; border: none; border-radius: 0; padding: 1rem; max-height: 280px; overflow-y: auto; font-family: monospace; font-size: 0.75rem; color: #E2E8F0; scrollbar-width: thin;">
+              {% for l in logs %}
+              <div class="log-line" style="display: flex; gap: 0.5rem; align-items: baseline; padding: 0.25rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
+                <span class="log-badge {{ l.tipo }}" style="flex-shrink: 0; font-size: 0.55rem; font-weight: 700; padding: 0.125rem 0.375rem; border-radius: 3px; text-transform: uppercase;">{{ l.tipo }}</span>
+                <span class="log-server" style="color: var(--text-muted); flex-shrink: 0; width: 90px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{ l.servidor_id or 'sistema' }}</span>
+                <span class="log-msg" style="color: var(--text-secondary); flex: 1;">{{ l.mensagem }}</span>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
 
-    <!-- Coluna lateral — infraestrutura -->
-    <div style="display:flex;flex-direction:column;gap:1rem;">
-
-      <!-- Status urnas -->
-      <div class="card">
-        <div class="card-header">
-          <span class="card-title"> Servidores de Urna</span>
-          <span class="badge badge-green" id="badge-urnas-online">{{ urnas | selectattr('status','eq','online') | list | length }} online</span>
-        </div>
-        <div class="card-body">
-          <div class="server-grid" id="grid-urnas">
-            {% for u in urnas %}
-            <div class="server-card {{ u.status }}" id="urna-{{ u.porta }}">
-              <div class="server-dot {{ u.status }}"></div>
-              <div class="server-name">Urna</div>
-              <div class="server-port">:{{ u.porta }}</div>
-              <div class="server-votes">{{ u.votos_recebidos or 0 }}</div>
-              <div style="font-size:0.65rem;color:var(--text-muted);">votos</div>
-            </div>
-            {% else %}
-            <p class="text-muted text-sm">Infraestrutura inicializando...</p>
-            {% endfor %}
-          </div>
-        </div>
-      </div>
-
-      <!-- Status contadores -->
-      <div class="card">
-        <div class="card-header">
-          <span class="card-title"> Servidores de Contagem</span>
-          <span class="badge badge-blue" id="badge-cont-online">{{ contadores | selectattr('status','eq','online') | list | length }} online</span>
-        </div>
-        <div class="card-body">
-          <div class="server-grid" id="grid-contadores">
-            {% for c in contadores %}
-            <div class="server-card {{ c.status }}" id="cont-{{ c.porta }}" style="border-color:{% if c.status=='online' %}var(--green){% elif c.status=='offline' %}var(--red){% else %}var(--yellow){% endif %};">
-              <div class="server-dot {{ c.status }}"></div>
-              <div class="server-name">Contador</div>
-              <div class="server-port">:{{ c.porta }}</div>
-            </div>
-            {% endfor %}
-          </div>
-        </div>
-      </div>
-
-      <!-- Logs em tempo real -->
-      <div class="card">
-        <div class="card-header">
-          <span class="card-title"> Logs em Tempo Real</span>
-          <span class="badge badge-yellow" id="badge-live"> AO VIVO</span>
-        </div>
-        <div class="card-body" style="padding:0.5rem;">
-          <div class="log-terminal" id="log-terminal">
-            {% for l in logs %}
-            <div class="log-line">
-              <span class="log-badge {{ l.tipo }}">{{ l.tipo }}</span>
-              <span class="log-server">{{ l.servidor_id or 'sistema' }}</span>
-              <span class="log-msg">{{ l.mensagem }}</span>
-            </div>
-            {% endfor %}
-          </div>
-        </div>
-      </div>
-
-    </div>
   </div>
-</div>
 </div>
 {% endblock %}
 
@@ -163,90 +237,147 @@
 <script>
 const VOTACAO_ID = "{{ votacao._id | objectid_str }}";
 const socket = io();
-let chart = null;
 
 socket.on('connect', () => {
   socket.emit('join_votacao', { votacao_id: VOTACAO_ID });
 });
 
-// Novos logs
+// Logs socket update
 socket.on('novo_log', data => {
   if (data.votacao_id !== VOTACAO_ID) return;
   const terminal = document.getElementById('log-terminal');
   const div = document.createElement('div');
   div.className = 'log-line';
+  div.style.display = 'flex';
+  div.style.gap = '0.5rem';
+  div.style.alignItems = 'baseline';
+  div.style.padding = '0.25rem 0';
+  div.style.borderBottom = '1px solid rgba(255, 255, 255, 0.02)';
+  
+  // Clean values
+  const type = data.tipo || 'info';
+  const server = data.servidor || 'sistema';
+  const msg = data.mensagem || '';
+  
+  // Build badges CSS dynamically matching style.css token definitions
+  let badgeColor = 'background: var(--blue-glow); color: var(--blue);';
+  if (type === 'erro' || type === 'falha') badgeColor = 'background: var(--red-glow); color: var(--red);';
+  else if (type === 'voto') badgeColor = 'background: var(--green-glow); color: var(--green);';
+  else if (type === 'heartbeat') badgeColor = 'background: var(--yellow-glow); color: var(--yellow);';
+  else if (type === 'encerramento') badgeColor = 'background: var(--purple-glow); color: var(--purple);';
+
   div.innerHTML = `
-    <span class="log-badge ${data.tipo}">${data.tipo}</span>
-    <span class="log-server">${data.servidor || 'sistema'}</span>
-    <span class="log-msg">${data.mensagem}</span>
+    <span class="log-badge ${type}" style="flex-shrink: 0; font-size: 0.55rem; font-weight: 700; padding: 0.125rem 0.375rem; border-radius: 3px; text-transform: uppercase; ${badgeColor}">${type}</span>
+    <span class="log-server" style="color: var(--text-muted); flex-shrink: 0; width: 90px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${server}</span>
+    <span class="log-msg" style="color: var(--text-secondary); flex: 1;">${msg}</span>
   `;
+  
   terminal.insertBefore(div, terminal.firstChild);
-  while (terminal.children.length > 50) terminal.removeChild(terminal.lastChild);
+  while (terminal.children.length > 50) {
+    terminal.removeChild(terminal.lastChild);
+  }
 });
 
-// Atualização de resultado
+// Results socket update
 socket.on('resultado_update', data => {
   if (data.votacao_id !== VOTACAO_ID) return;
+  
+  // Update totals
   document.getElementById('total-votos-display').textContent = `${data.total_votos} votos`;
+  const topCount = document.getElementById('total-votos-top-count');
+  if (topCount) topCount.textContent = data.total_votos;
+  
   const total = data.total_votos || 1;
+  
   data.resultado.forEach(r => {
     document.querySelectorAll('.resultado-fill').forEach(fill => {
       const parent = fill.closest('.resultado-bar');
-      const nome = parent?.querySelector('.resultado-nome')?.textContent?.trim();
-      if (nome && nome.includes(r.nome)) {
-        fill.style.width = r.pct + '%';
-        const badge = parent.querySelector('.badge-blue');
-        if (badge) badge.textContent = r.pct + '%';
-        const vSpan = parent.querySelector('.resultado-bar-header [style*="font-weight:700"]');
-        if (vSpan) vSpan.textContent = r.votos;
+      const nomeElement = parent?.querySelector('.resultado-nome');
+      if (nomeElement) {
+        // Exclude the candidate number span to check only candidate name
+        const clone = nomeElement.cloneNode(true);
+        const childSpan = clone.querySelector('span');
+        if (childSpan) childSpan.remove();
+        
+        const nomeText = clone.textContent.trim();
+        if (nomeText === r.nome) {
+          fill.style.width = r.pct + '%';
+          
+          const pctBadge = parent.querySelector('.badge-blue');
+          if (pctBadge) pctBadge.textContent = r.pct + '%';
+          
+          const vSpan = parent.querySelector('.resultado-bar-header span[style*="font-weight:700"]');
+          if (vSpan) vSpan.textContent = r.votos;
+        }
       }
     });
   });
 });
 
-// Status de servidor
+// Server status socket update
 socket.on('status_servidor', data => {
   if (data.votacao_id !== VOTACAO_ID) return;
   const el = document.getElementById(`${data.tipo}-${data.porta}`);
   if (el) {
     el.className = `server-card ${data.status}`;
+    // Dynamic border color styling
+    if (data.status === 'online') {
+      el.style.borderColor = (data.tipo === 'cont') ? 'var(--purple)' : 'rgba(34, 197, 94, 0.3)';
+    } else if (data.status === 'offline') {
+      el.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+    } else {
+      el.style.borderColor = 'rgba(245, 158, 11, 0.3)';
+    }
     const dot = el.querySelector('.server-dot');
     if (dot) dot.className = `server-dot ${data.status}`;
   }
 });
 
-// Polling de status a cada 5s
+// Status checking interval 5s
 setInterval(async () => {
   try {
     const r = await fetch(`/api/votacoes/${VOTACAO_ID}/status`);
     const d = await r.json();
+    
     if (d.urnas) {
       let onlineU = 0;
       d.urnas.forEach(u => {
         const el = document.getElementById(`urna-${u.porta}`);
         if (el) {
           el.className = `server-card ${u.status}`;
-          el.querySelector('.server-dot').className = `server-dot ${u.status}`;
+          if (u.status === 'online') el.style.borderColor = 'rgba(34, 197, 94, 0.3)';
+          else if (u.status === 'offline') el.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+          else el.style.borderColor = 'rgba(245, 158, 11, 0.3)';
+          
+          const dot = el.querySelector('.server-dot');
+          if (dot) dot.className = `server-dot ${u.status}`;
+          
           const v = el.querySelector('.server-votes');
           if (v) v.textContent = u.votos_recebidos || 0;
         }
         if (u.status === 'online') onlineU++;
       });
       const bu = document.getElementById('badge-urnas-online');
-      if (bu) bu.textContent = `${onlineU} online`;
+      if (bu) bu.textContent = `${onlineU} ONLINE`;
     }
+    
     if (d.contadores) {
       let onlineC = 0;
       d.contadores.forEach(c => {
         const el = document.getElementById(`cont-${c.porta}`);
         if (el) {
           el.className = `server-card ${c.status}`;
-          el.querySelector('.server-dot').className = `server-dot ${c.status}`;
+          if (c.status === 'online') el.style.borderColor = 'var(--purple)';
+          else if (c.status === 'offline') el.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+          else el.style.borderColor = 'rgba(245, 158, 11, 0.3)';
+          
+          const dot = el.querySelector('.server-dot');
+          if (dot) dot.className = `server-dot ${c.status}`;
         }
         if (c.status === 'online') onlineC++;
       });
       const bc = document.getElementById('badge-cont-online');
-      if (bc) bc.textContent = `${onlineC} online`;
+      if (bc) bc.textContent = `${onlineC} ONLINE`;
     }
   } catch(e) {}
 }, 5000);

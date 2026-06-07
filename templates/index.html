@@ -1,155 +1,218 @@
 {% extends "base.html" %}
-{% block title %}VotoDistribuído — Plataforma de Votação Distribuída{% endblock %}
+{% block title %}VotoDistribuído — Sistema Seguro de Votação Online{% endblock %}
 
 {% block content %}
-<!-- HERO -->
+<!-- HERO SECTION -->
 <section class="hero">
-  <div style="position:relative; z-index:1; max-width:700px;">
-    <div class="badge badge-blue mb-2" style="margin:0 auto 1rem; display:inline-flex;">
-       Projeto Acadêmico · Sistemas Distribuídos
+  <div class="container" style="position: relative; z-index: 10; max-width: 800px; margin: 0 auto; text-align: center; padding: 4rem 1rem 2rem;">
+    <div class="badge badge-blue mb-2" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 99px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span>Infraestrutura Criptográfica & Distribuída</span>
     </div>
-    <h1 class="hero-title">Votação Distribuída<br>em Tempo Real</h1>
-    <p class="hero-subtitle">
-      Plataforma com infraestrutura distribuída por votação — coordenadores,
-      urnas e contadores independentes, replicação e tolerância a falhas.
+    
+    <h1 class="hero-title" style="font-size: 3rem; font-weight: 800; letter-spacing: -0.025em; line-height: 1.15; margin-bottom: 1.5rem; background: linear-gradient(135deg, #FFF 0%, #A8B3CF 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+      Decisões Coletivas com<br>
+      <span style="background: linear-gradient(135deg, #4F8CFF 0%, #8B5CF6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Transparência Absoluta</span>
+    </h1>
+    
+    <p class="hero-subtitle" style="font-size: 1.125rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto 2.5rem; line-height: 1.6;">
+      Garanta a integridade de assembleias e eleições através de um protocolo robusto de consenso, replicação ativa e tolerância automática a falhas de rede.
     </p>
-    <div class="hero-actions">
-      <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg" id="btn-comecar">
-         Começar agora
+    
+    <div class="hero-actions" style="display: flex; gap: 1rem; justify-content: center; align-items: center;">
+      <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg" id="btn-comecar" style="box-shadow: 0 0 20px rgba(79, 140, 255, 0.3);">
+        Criar Conta
       </a>
-      <a href="{{ url_for('votacoes.lista') }}" class="btn btn-ghost btn-lg" id="btn-ver-votacoes">
-        Ver votações
+      <a href="{{ url_for('votacoes.lista') }}" class="btn btn-ghost btn-lg" id="btn-ver-votacoes" style="border: 1px solid var(--border);">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+        Ver Votações
       </a>
     </div>
 
-    <!-- Stats -->
-    <div class="stats-grid mt-3" style="max-width:480px; margin:2.5rem auto 0;">
-      <div class="stat-card" style="text-align:center;">
-        <span class="stat-label">Votações</span>
-        <span class="stat-value" id="stat-votacoes">{{ stats.votacoes }}</span>
+    <!-- Stats Grid -->
+    <div class="stats-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; max-width: 580px; margin: 4rem auto 0; padding: 0.5rem;">
+      <div class="stat-card" style="background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; transition: var(--transition);">
+        <span class="stat-label" style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.5rem;">Eleições Ativas</span>
+        <span class="stat-value" id="stat-votacoes" style="font-size: 2rem; font-weight: 700; color: var(--blue);">{{ stats.votacoes }}</span>
       </div>
-      <div class="stat-card green" style="text-align:center;">
-        <span class="stat-label">Votos</span>
-        <span class="stat-value" id="stat-votos">{{ stats.votos }}</span>
+      <div class="stat-card green" style="background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; transition: var(--transition);">
+        <span class="stat-label" style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.5rem;">Votos Confirmados</span>
+        <span class="stat-value" id="stat-votos" style="font-size: 2rem; font-weight: 700; color: var(--green);">{{ stats.votos }}</span>
       </div>
-      <div class="stat-card purple" style="text-align:center;">
-        <span class="stat-label">Usuários</span>
-        <span class="stat-value" id="stat-usuarios">{{ stats.usuarios }}</span>
+      <div class="stat-card purple" style="background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; transition: var(--transition);">
+        <span class="stat-label" style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.5rem;">Eleitores Registrados</span>
+        <span class="stat-value" id="stat-usuarios" style="font-size: 2rem; font-weight: 700; color: var(--purple);">{{ stats.usuarios }}</span>
       </div>
     </div>
   </div>
 </section>
 
-<!-- COMO FUNCIONA -->
-<section style="padding:4rem 0; background:var(--bg-secondary); border-top:1px solid var(--border);">
-  <div class="container">
-    <h2 class="section-title" style="justify-content:center; text-align:center; font-size:1.75rem;">
-      Como funciona a arquitetura?
-    </h2>
-    <div class="grid-3" style="margin-top:2rem;">
-      <div class="glass-card text-center fade-in">
-        <div style="font-size:2.5rem; margin-bottom:1rem;"></div>
-        <h3 style="margin-bottom:0.5rem; font-weight:700;">Coordenador</h3>
-        <p class="text-muted text-sm">Cada votação tem seu próprio coordenador que cria e monitora toda a infraestrutura de urnas e contadores.</p>
-      </div>
-      <div class="glass-card text-center fade-in" style="animation-delay:.1s">
-        <div style="font-size:2.5rem; margin-bottom:1rem;"></div>
-        <h3 style="margin-bottom:0.5rem; font-weight:700;">Urnas</h3>
-        <p class="text-muted text-sm">Múltiplas urnas independentes recebem votos em paralelo. Balanceamento round-robin garante distribuição uniforme.</p>
-      </div>
-      <div class="glass-card text-center fade-in" style="animation-delay:.2s">
-        <div style="font-size:2.5rem; margin-bottom:1rem;"></div>
-        <h3 style="margin-bottom:0.5rem; font-weight:700;">Contadores</h3>
-        <p class="text-muted text-sm">Contadores replicam votos entre si garantindo consistência. Tolerância a falhas com recuperação automática.</p>
-      </div>
+<!-- ARQUITETURA / TOPOLOGIA -->
+<section style="padding: 6rem 0; background: var(--bg-secondary); border-top: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle);">
+  <div class="container" style="max-width: 1100px; margin: 0 auto; padding: 0 1.5rem;">
+    <div style="text-align: center; max-width: 600px; margin: 0 auto 3.5rem;">
+      <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 1rem;">Topologia da Rede Distribuída</h2>
+      <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6;">
+        Cada processo de votação provisiona uma infraestrutura sob demanda isolada, minimizando gargalos e garantindo redundância total.
+      </p>
     </div>
 
-    <!-- Diagrama visual -->
-    <div class="card mt-3" style="padding:2rem; text-align:center;">
-      <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1.5rem; font-family:monospace;">
-        Eleitor → [app.py] → Coordenador → Urna → Contador Primário → Réplicas
-      </div>
-      <div class="topology">
-        <div class="server-card" style="display:inline-flex; align-items:center; gap:0.5rem; padding:0.6rem 1.2rem; background:var(--blue-glow); border-color:var(--blue);">
-          <span class="server-dot online"></span>
-          <span style="font-weight:700; font-size:0.85rem;"> Coordenador</span>
+    <!-- Topology Visualizer -->
+    <div class="card" style="padding: 3rem 2rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+      <div class="topology" style="display: flex; flex-direction: column; align-items: center; gap: 2rem; position: relative;">
+        
+        <!-- Coordenador -->
+        <div class="server-card" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem 1.5rem; background: var(--blue-muted); border: 1px solid var(--blue); border-radius: var(--radius-md); box-shadow: var(--shadow-glow); min-width: 180px; justify-content: center;">
+          <span class="server-dot online" style="width: 8px; height: 8px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 10px var(--blue); display: inline-block;"></span>
+          <span style="font-weight: 600; font-size: 0.9rem; letter-spacing: 0.025em; text-transform: uppercase;">Coordenador</span>
         </div>
-        <div class="topo-line"></div>
-        <div class="topology-row">
-          {% for i in range(3) %}
-          <div class="server-card online" style="min-width:100px;">
-            <div class="server-dot online"></div>
-            <div class="server-name"> Urna {{ i+1 }}</div>
-            <div class="server-port">:800{{ i+1 }}</div>
-          </div>
-          {% endfor %}
-        </div>
-        <div class="topo-line"></div>
-        <div class="topology-row">
-          {% for i in range(2) %}
-          <div class="server-card online" style="min-width:110px; border-color:var(--green);">
-            <div class="server-dot online"></div>
-            <div class="server-name"> Contador {{ i+1 }}</div>
-            <div class="server-port">:900{{ i+1 }}</div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FEATURES -->
-<section style="padding:4rem 0;">
-  <div class="container">
-    <div class="grid-2">
-      <div>
-        <h2 style="font-size:1.5rem; font-weight:800; margin-bottom:1rem;">Conceitos de SD demonstrados</h2>
-        <div style="display:flex; flex-direction:column; gap:0.75rem;">
-          {% set features = [
-            ("", "Comunicação entre processos", "TCP Sockets entre urnas, contadores e coordenador"),
-            ("", "Replicação de dados", "Votos replicados para todos os contadores"),
-            ("", "Tolerância a falhas", "Detecção automática de servidores offline"),
-            ("", "Coordenação distribuída", "Coordenador monitora e gerencia toda a infraestrutura"),
-            ("", "Balanceamento de carga", "Round-robin entre urnas disponíveis"),
-            ("", "Consistência", "Todos os contadores mantêm os mesmos resultados"),
-          ] %}
-          {% for icon, title, desc in features %}
-          <div style="display:flex; gap:1rem; align-items:flex-start; padding:0.875rem; background:var(--bg-glass); border:1px solid var(--border); border-radius:var(--radius-md);">
-            <span style="font-size:1.25rem;">{{ icon }}</span>
-            <div>
-              <div style="font-weight:600; font-size:0.9rem;">{{ title }}</div>
-              <div class="text-muted text-sm">{{ desc }}</div>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      <div style="display:flex; flex-direction:column; gap:1rem;">
-        <div class="card" style="flex:1;">
-          <div class="card-header">
-            <span class="card-title"> Stack Tecnológico</span>
-          </div>
-          <div class="card-body" style="display:flex; flex-direction:column; gap:0.75rem;">
-            {% set stack = [
-              ("Python + Flask", "Backend e API REST", "var(--blue)"),
-              ("Flask-SocketIO", "Tempo real (WebSocket)", "var(--green)"),
-              ("MongoDB", "Persistência e logs", "var(--yellow)"),
-              ("TCP Sockets", "Comunicação entre processos", "var(--purple)"),
-              ("subprocess.Popen", "Spawn dinâmico de servidores", "var(--red)"),
-            ] %}
-            {% for name, desc, color in stack %}
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:0.6rem 0; border-bottom:1px solid var(--border);">
-              <div>
-                <span style="font-weight:600; font-size:0.875rem;">{{ name }}</span>
-                <div style="font-size:0.75rem; color:var(--text-secondary);">{{ desc }}</div>
+        
+        <div class="topo-line" style="width: 2px; height: 30px; background: linear-gradient(180deg, var(--blue) 0%, var(--border) 100%);"></div>
+        
+        <!-- Urnas (Clients) -->
+        <div style="text-align: center; width: 100%;">
+          <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;">Camada de Ingestão (Urnas Virtuais)</div>
+          <div class="topology-row" style="display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;">
+            {% for i in range(3) %}
+            <div class="server-card online" style="background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem 1.25rem; min-width: 140px; display: flex; flex-direction: column; align-items: center; gap: 0.375rem; transition: var(--transition);">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span class="server-dot online" style="width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); display: inline-block;"></span>
+                <span class="server-name" style="font-weight: 600; font-size: 0.85rem;">Urna 0{{ i+1 }}</span>
               </div>
-              <div style="width:8px;height:8px;border-radius:50%;background:{{ color }};box-shadow:0 0 8px {{ color }};"></div>
+              <div class="server-port" style="font-family: monospace; font-size: 0.75rem; color: var(--text-muted);">Port :800{{ i+1 }}</div>
             </div>
             {% endfor %}
           </div>
         </div>
+        
+        <div class="topo-line" style="width: 2px; height: 30px; background: var(--border);"></div>
+        
+        <!-- Contadores (Storage / Consensus) -->
+        <div style="text-align: center; width: 100%;">
+          <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;">Camada de Consenso (Contadores Replicados)</div>
+          <div class="topology-row" style="display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;">
+            {% for i in range(2) %}
+            <div class="server-card online" style="background: var(--bg-glass); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1rem 1.25rem; min-width: 150px; display: flex; flex-direction: column; align-items: center; gap: 0.375rem; transition: var(--transition);">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span class="server-dot online" style="width: 8px; height: 8px; border-radius: 50%; background: var(--purple); box-shadow: 0 0 8px var(--purple); display: inline-block;"></span>
+                <span class="server-name" style="font-weight: 600; font-size: 0.85rem;">Contador 0{{ i+1 }}</span>
+              </div>
+              <div class="server-port" style="font-family: monospace; font-size: 0.75rem; color: var(--text-muted);">Port :900{{ i+1 }}</div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONCEITOS E STACK -->
+<section style="padding: 6rem 0;">
+  <div class="container" style="max-width: 1100px; margin: 0 auto; padding: 0 1.5rem;">
+    <div class="grid-2" style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 4rem; align-items: start;">
+      
+      <!-- Conceitos SD -->
+      <div>
+        <h2 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 2rem;">Arquitetura sob os Padrões de Mercado</h2>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          
+          <div style="display: flex; gap: 1.25rem; align-items: flex-start; padding: 1.25rem; background: var(--bg-glass); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); transition: var(--transition);">
+            <div style="color: var(--blue); padding: 0.5rem; background: var(--blue-glow); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 6.1H3M21 12H3M17 17.9H3"/></svg>
+            </div>
+            <div>
+              <div style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.25rem; color: var(--text-primary);">Comunicação IPC de Alta Performance</div>
+              <div style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.5;">Troca de mensagens assíncronas através de sockets TCP nativos entre urnas, contadores e coordenador.</div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 1.25rem; align-items: flex-start; padding: 1.25rem; background: var(--bg-glass); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); transition: var(--transition);">
+            <div style="color: var(--purple); padding: 0.5rem; background: rgba(139, 92, 246, 0.1); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+            </div>
+            <div>
+              <div style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.25rem; color: var(--text-primary);">Replicação Ativa de Estado</div>
+              <div style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.5;">Sincronização imediata de votos em todos os contadores da rede para impedir perda ou adulteração.</div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 1.25rem; align-items: flex-start; padding: 1.25rem; background: var(--bg-glass); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); transition: var(--transition);">
+            <div style="color: var(--green); padding: 0.5rem; background: var(--green-glow); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div>
+              <div style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.25rem; color: var(--text-primary);">Resiliência & Tolerância a Falhas</div>
+              <div style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.5;">O sistema permanece online e operacional mesmo com a desconexão ou indisponibilidade parcial de servidores de coleta.</div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 1.25rem; align-items: flex-start; padding: 1.25rem; background: var(--bg-glass); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); transition: var(--transition);">
+            <div style="color: var(--yellow); padding: 0.5rem; background: var(--yellow-glow); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
+            </div>
+            <div>
+              <div style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.25rem; color: var(--text-primary);">Balanceamento Dinâmico de Carga</div>
+              <div style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.5;">Distribuição balanceada round-robin dos votos de entrada entre todas as urnas ativas para otimizar processamento.</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Stack Tecnológico -->
+      <div class="card" style="padding: 2rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); align-self: stretch;">
+        <h3 style="font-size: 1.2rem; font-weight: 600; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--blue);"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+          Stack Tecnológica
+        </h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-subtle);">
+            <div>
+              <span style="font-weight: 600; font-size: 0.875rem; color: var(--text-primary);">Python + Flask</span>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Serviço REST e roteamento principal</div>
+            </div>
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 8px var(--blue);"></span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-subtle);">
+            <div>
+              <span style="font-weight: 600; font-size: 0.875rem; color: var(--text-primary);">Flask-SocketIO</span>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Sincronização em tempo real</div>
+            </div>
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green);"></span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-subtle);">
+            <div>
+              <span style="font-weight: 600; font-size: 0.875rem; color: var(--text-primary);">MongoDB Database</span>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Persistência de eventos e auditoria</div>
+            </div>
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--yellow); box-shadow: 0 0 8px var(--yellow);"></span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-subtle);">
+            <div>
+              <span style="font-weight: 600; font-size: 0.875rem; color: var(--text-primary);">Sockets TCP Nativo</span>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Troca de mensagens ultra-veloz</div>
+            </div>
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--purple); box-shadow: 0 0 8px var(--purple);"></span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <span style="font-weight: 600; font-size: 0.875rem; color: var(--text-primary);">Process Spawning</span>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Instanciação paralela via subprocess</div>
+            </div>
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--red); box-shadow: 0 0 8px var(--red);"></span>
+          </div>
+
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
