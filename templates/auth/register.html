@@ -2,89 +2,161 @@
 {% block title %}Criar Conta — VotoDistribuído{% endblock %}
 
 {% block content %}
-<div class="auth-page">
-  <div class="auth-card fade-in">
-    <h1 class="auth-title">Registrar Credenciais</h1>
-    <p class="auth-subtitle">Crie seu perfil seguro de assinante digital</p>
+<div class="auth-split-page">
 
-    <!-- Google OAuth -->
-    <a href="{{ url_for('auth.google_login') }}" class="btn btn-ghost btn-full" id="btn-google-register" style="border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; gap: 0.75rem; padding: 0.75rem; font-weight: 500; font-size: 0.875rem;">
-      <svg width="18" height="18" viewBox="0 0 48 48">
-        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.36-8.16 2.36-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-      </svg>
-      Cadastrar com o Google
-    </a>
-
-    <div class="auth-divider">ou registro padrão</div>
-
-    <form method="POST" action="{{ url_for('auth.register') }}" id="register-form">
-      <div class="form-group" style="margin-bottom: 1.25rem;">
-        <label for="nome" style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600;">Nome Completo</label>
-        <input type="text" id="nome" name="nome" placeholder="Ex: Ana Silva" required autocomplete="name" style="width: 100%; padding: 0.75rem 1rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 0.875rem; transition: var(--transition);" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'">
+  <!-- LEFT: Brand Panel -->
+  <div class="auth-brand-panel">
+    <div class="auth-brand-content">
+      <div class="auth-brand-logo">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M9 12L11 14L15 10" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>VotoDistribuído</span>
       </div>
 
-      <div class="form-group" style="margin-bottom: 1.25rem;">
-        <label for="email" style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600;">Endereço de E-mail</label>
-        <input type="email" id="email" name="email" placeholder="nome@provedor.com" required autocomplete="email" style="width: 100%; padding: 0.75rem 1rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 0.875rem; transition: var(--transition);" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'">
+      <div class="auth-brand-body">
+        <h2 class="auth-brand-title">Crie sua conta em segundos</h2>
+        <p class="auth-brand-sub">Junte-se à plataforma de votação distribuída mais segura do Brasil.</p>
+
+        <!-- Testimonial / Social Proof -->
+        <div class="auth-social-proof">
+          <div class="auth-proof-avatars">
+            <div class="auth-proof-avatar" style="background: linear-gradient(135deg, #2563EB, #7C3AED);">A</div>
+            <div class="auth-proof-avatar" style="background: linear-gradient(135deg, #16A34A, #059669);">B</div>
+            <div class="auth-proof-avatar" style="background: linear-gradient(135deg, #EA580C, #DC2626);">C</div>
+            <div class="auth-proof-avatar" style="background: linear-gradient(135deg, #7C3AED, #4F46E5);">D</div>
+          </div>
+          <div>
+            <div class="auth-proof-text">Confiado por organizações em todo o Brasil</div>
+            <div class="auth-proof-sub">Eleições, assembleias e pesquisas corporativas</div>
+          </div>
+        </div>
+
+        <ul class="auth-feature-list">
+          <li>
+            <div class="auth-feature-icon blue">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+            <div>
+              <div class="auth-feature-title">Cadastro 100% gratuito</div>
+              <div class="auth-feature-desc">Sem custos ocultos para criar e gerenciar votações</div>
+            </div>
+          </li>
+          <li>
+            <div class="auth-feature-icon green">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div>
+              <div class="auth-feature-title">Pronto em menos de 5 minutos</div>
+              <div class="auth-feature-desc">Configure sua primeira votação distribuída rapidamente</div>
+            </div>
+          </li>
+          <li>
+            <div class="auth-feature-icon purple">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <div>
+              <div class="auth-feature-title">Login via Google disponível</div>
+              <div class="auth-feature-desc">Acesso rápido com sua conta Google existente</div>
+            </div>
+          </li>
+        </ul>
       </div>
 
-      <div class="form-group" style="margin-bottom: 1.25rem;">
-        <label for="senha" style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600;">Senha Forte</label>
-        <div style="position: relative;">
-          <input type="password" id="senha" name="senha" placeholder="Mínimo 6 caracteres" required minlength="6" style="width: 100%; padding: 0.75rem 2.5rem 0.75rem 1rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 0.875rem; transition: var(--transition);" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'">
-          <button type="button" onclick="toggleSenha('senha','eye-icon-1')" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; padding: 0.25rem;" id="olho1" aria-label="Mostrar/ocultar senha">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="eye-icon-1"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
-        </div>
-        <!-- Strength indicator -->
-        <div id="senha-strength" style="margin-top: 0.5rem; height: 4px; border-radius: 2px; background: var(--border); overflow: hidden;">
-          <div id="strength-bar" style="height: 100%; width: 0; transition: all 0.3s; background: var(--red);"></div>
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.25rem;">
-          <span style="font-size: 0.7rem; color: var(--text-muted);">Complexidade da senha</span>
-          <span id="strength-text" style="font-size: 0.7rem; font-weight: 600;"></span>
-        </div>
+      <div class="auth-brand-footer">
+        © 2026 VotoDistribuído · Plataforma Segura de Votação Online
       </div>
-
-      <div class="form-group" style="margin-bottom: 1.5rem;">
-        <label for="confirmar_senha" style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600;">Confirmar Senha</label>
-        <div style="position: relative;">
-          <input type="password" id="confirmar_senha" name="confirmar_senha" placeholder="Repita a senha anterior" required minlength="6" style="width: 100%; padding: 0.75rem 2.5rem 0.75rem 1rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 0.875rem; transition: var(--transition);" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'">
-          <button type="button" onclick="toggleSenha('confirmar_senha','eye-icon-2')" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; padding: 0.25rem;" id="olho2" aria-label="Mostrar/ocultar senha">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="eye-icon-2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
-        </div>
-        <span id="conf-match" style="font-size: 0.75rem; display: block; margin-top: 0.25rem; font-weight: 500;"></span>
-      </div>
-
-      <button type="submit" class="btn btn-primary btn-full" id="btn-register" style="padding: 0.75rem; font-weight: 600; font-size: 0.875rem;">
-        Criar Nova Credencial
-      </button>
-    </form>
-
-    <p class="text-center mt-2" style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 1.5rem; text-align: center;">
-      Já possui conta registrada?
-      <a href="{{ url_for('auth.login') }}" style="color: var(--blue); font-weight: 600; transition: var(--transition);">Entrar</a>
-    </p>
+    </div>
   </div>
+
+  <!-- RIGHT: Form Panel -->
+  <div class="auth-form-panel">
+    <div class="auth-form-inner fade-in">
+      <div class="auth-form-header">
+        <h1 class="auth-form-title">Criar nova conta</h1>
+        <p class="auth-form-sub">Preencha os campos abaixo para começar</p>
+      </div>
+
+      <!-- Google OAuth -->
+      <a href="{{ url_for('auth.google_login') }}" class="btn btn-ghost btn-full" id="btn-google-register" style="margin-bottom: 4px; height: 44px;">
+        <svg width="18" height="18" viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.36-8.16 2.36-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        Cadastrar com Google
+      </a>
+
+      <div class="auth-divider">ou cadastro por e-mail</div>
+
+      <form method="POST" action="{{ url_for('auth.register') }}" id="register-form">
+        <div class="form-group">
+          <label for="nome" class="auth-field-label">Nome Completo</label>
+          <input type="text" id="nome" name="nome" placeholder="Ex: Ana Silva" required autocomplete="name">
+        </div>
+
+        <div class="form-group">
+          <label for="email" class="auth-field-label">Endereço de E-mail</label>
+          <input type="email" id="email" name="email" placeholder="nome@provedor.com" required autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label for="senha" class="auth-field-label">Senha</label>
+          <div style="position: relative;">
+            <input type="password" id="senha" name="senha" placeholder="Mínimo 6 caracteres" required minlength="6" style="padding-right: 44px;">
+            <button type="button" onclick="toggleSenha('senha','eye-icon-1')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; padding: 4px;" aria-label="Mostrar/ocultar senha">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="eye-icon-1"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <!-- Strength indicator -->
+          <div id="senha-strength" style="margin-top: 8px; height: 4px; border-radius: 2px; background: var(--border); overflow: hidden;">
+            <div id="strength-bar" style="height: 100%; width: 0; transition: all 0.3s; background: var(--red);"></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+            <span style="font-size: 11px; color: var(--text-muted);">Força da senha</span>
+            <span id="strength-text" style="font-size: 11px; font-weight: 600;"></span>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label for="confirmar_senha" class="auth-field-label">Confirmar Senha</label>
+          <div style="position: relative;">
+            <input type="password" id="confirmar_senha" name="confirmar_senha" placeholder="Repita a senha" required minlength="6" style="padding-right: 44px;">
+            <button type="button" onclick="toggleSenha('confirmar_senha','eye-icon-2')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; padding: 4px;" aria-label="Mostrar/ocultar senha">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="eye-icon-2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <span id="conf-match" style="font-size: 12px; display: block; margin-top: 4px; font-weight: 500;"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full" id="btn-register" style="height: 44px; font-weight: 600; font-size: 15px;">
+          Criar minha conta
+        </button>
+      </form>
+
+      <p class="auth-footer-link">
+        Já tem uma conta?
+        <a href="{{ url_for('auth.login') }}">Entrar agora</a>
+      </p>
+    </div>
+  </div>
+
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-function toggleSenha(inputId, eyeIconId) {
+function toggleSenha(inputId, iconId) {
   const inp = document.getElementById(inputId);
   const isPrivate = inp.type === 'password';
   inp.type = isPrivate ? 'text' : 'password';
-  
-  const eyeIcon = document.getElementById(eyeIconId);
+  const icon = document.getElementById(iconId);
   if (isPrivate) {
-    eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
   } else {
-    eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
   }
 }
 
@@ -99,10 +171,10 @@ document.getElementById('senha').addEventListener('input', function() {
   if (/[A-Z]/.test(v)) score++;
   if (/[0-9]/.test(v)) score++;
   if (/[^A-Za-z0-9]/.test(v)) score++;
-  
+
   const labels = ['', 'Muito Fraca', 'Fraca', 'Moderada', 'Forte', 'Excelente'];
   const colors = ['', 'var(--red)', 'var(--red)', 'var(--yellow)', 'var(--green)', 'var(--green)'];
-  
+
   bar.style.width = (score * 20) + '%';
   bar.style.background = colors[score] || 'var(--border)';
   txt.textContent = labels[score] || '';
@@ -116,10 +188,10 @@ document.getElementById('confirmar_senha').addEventListener('input', function() 
   if (!this.value) {
     match.textContent = '';
   } else if (this.value === primaryVal) {
-    match.textContent = 'As senhas coincidem';
+    match.textContent = '✓ As senhas coincidem';
     match.style.color = 'var(--green)';
   } else {
-    match.textContent = 'As senhas não coincidem';
+    match.textContent = '✗ As senhas não coincidem';
     match.style.color = 'var(--red)';
   }
 });
