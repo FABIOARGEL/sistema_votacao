@@ -20,12 +20,11 @@ class UserModel:
     # ------------------------------------------------------------------
     @staticmethod
     def criar(nome: str, email: str, senha: str | None = None,
-              google_id: str | None = None, foto: str | None = None) -> ObjectId:
+              foto: str | None = None) -> ObjectId:
         doc = {
             "nome":         nome,
             "email":        email.lower().strip(),
             "senha_hash":   bcrypt.generate_password_hash(senha).decode() if senha else None,
-            "google_id":    google_id,
             "foto":         foto,
             "criado_em":    utcnow(),
             "ativo":        True,
@@ -48,9 +47,6 @@ class UserModel:
             user_id = ObjectId(user_id)
         return UserModel.col().find_one({"_id": user_id})
 
-    @staticmethod
-    def por_google_id(google_id: str) -> dict | None:
-        return UserModel.col().find_one({"google_id": google_id})
 
     # ------------------------------------------------------------------
     # Autenticação

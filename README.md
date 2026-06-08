@@ -53,8 +53,6 @@ copy .env.example .env
 
 Exemplo de conteúdo do arquivo `.env.example`:
 ```env
-GOOGLE_CLIENT_ID=seu_google_client_id_aqui
-GOOGLE_CLIENT_SECRET=seu_google_client_secret_aqui
 SECRET_KEY=mude-esta-chave-secreta-em-producao
 MONGO_URI=mongodb://localhost:27017/
 MONGO_DBNAME=sistema_votacao

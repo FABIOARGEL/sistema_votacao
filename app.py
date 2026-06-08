@@ -13,7 +13,7 @@ from bson import ObjectId
 from config import config
 from models import get_db
 from models.user import UserModel, bcrypt as _bcrypt
-from routes.auth import auth_bp, LoginUser, configurar_oauth
+from routes.auth import auth_bp, LoginUser
 from routes.votacoes import votacoes_bp
 from routes.dashboard import dashboard_bp
 from socket_handlers.events import socketio, iniciar_background_thread
@@ -40,8 +40,7 @@ def create_app():
         doc = UserModel.por_id(user_id)
         return LoginUser(doc) if doc else None
 
-    # OAuth
-    configurar_oauth(app)
+
 
     # Socket.IO
     socketio.init_app(

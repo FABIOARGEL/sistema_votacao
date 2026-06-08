@@ -10,11 +10,7 @@ class Config:
     MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
     MONGO_DBNAME = os.getenv("MONGO_DBNAME", "sistema_votacao")
     
-    # Google OAuth
-    GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
-    GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "")
-    GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
-    
+
     # Faixas de porta para servidores distribuídos
     # Coordenadores: 7000–7499  (max 500 votações simultâneas)
     # Urnas:         8000–8999
