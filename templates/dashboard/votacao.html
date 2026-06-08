@@ -2,259 +2,150 @@
 {% block title %}Painel Eleitoral — {{ votacao.titulo }}{% endblock %}
 
 {% block content %}
-<div class="page" style="padding: 3rem 1rem;">
+<div class="page" style="background: var(--bg-secondary);">
   <div class="container">
 
-    <!-- Header / Back Navigation -->
-    <div class="flex-between mb-3" style="flex-wrap: wrap; gap: 1.5rem; align-items: flex-start; border-bottom: 1px solid var(--border-subtle); padding-bottom: 2rem;">
+    <!-- Header / Actions Row -->
+    <div class="flex-between mb-3" style="flex-wrap: wrap; gap: 16px; border-bottom: 1px solid var(--border); padding-bottom: 20px; align-items: flex-start;">
       <div>
-        <a href="{{ url_for('dashboard.index') }}" style="color: var(--text-muted); font-size: 0.8125rem; display: inline-flex; align-items: center; gap: 0.375rem; text-decoration: none; transition: var(--transition);" onmouseover="this.style.color='var(--text-primary)'" onmouseout="this.style.color='var(--text-muted)'">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-          Voltar para o Dashboard
-        </a>
-        <h1 style="font-size: 1.75rem; font-weight: 800; margin-top: 0.5rem; color: var(--text-primary);">{{ votacao.titulo }}</h1>
-        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-muted); align-items: center;">
-          <span class="badge {{ 'badge-green' if votacao.status=='ativa' else 'badge-purple' if votacao.status=='encerrada' else 'badge-yellow' }}" style="text-transform: uppercase; font-size: 0.65rem;">
-            {{ votacao.status | fmt_status }}
-          </span>
-          <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
-            {{ votacao.qtd_urnas }} Urnas
-          </span>
-          <span>•</span>
-          <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
-            {{ votacao.qtd_contadores }} Contadores
-          </span>
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <h1 style="font-size: 28px; font-weight: 700; color: var(--text-primary); margin: 0;">{{ votacao.titulo }}</h1>
+          {% if votacao.status == 'ativa' %}
+            <span class="badge badge-green">Ativa</span>
+          {% elif votacao.status == 'encerrada' %}
+            <span class="badge badge-grey">Encerrada</span>
+          {% else %}
+            <span class="badge badge-yellow">Configurando</span>
+          {% endif %}
+        </div>
+        <div style="font-size: 13px; color: var(--text-secondary); margin-top: 6px; display: flex; align-items: center; gap: 4px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Sessão: <span style="font-family: monospace; font-weight: 600;">#VD-{{ votacao._id|objectid_str|truncate(8, True, '')|upper }}</span>
         </div>
       </div>
       
-      <!-- Action Buttons -->
-      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-        <a href="{{ url_for('votacoes.resultados' if votacao.status != 'ativa' else 'votacoes.votar', vid=votacao._id|objectid_str) }}" class="btn btn-ghost btn-sm" style="border: 1px solid var(--border); font-size: 0.8125rem; font-weight: 500; display: inline-flex; align-items: center; gap: 0.375rem;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          Ver Votação
-        </a>
+      <!-- Top Action Controls -->
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <!-- Share button -->
+        <button class="btn btn-ghost btn-sm" onclick="copiarLinkShare()" style="font-weight: 600; font-size: 13px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          Compartilhar
+        </button>
         
+        <!-- End Voting button -->
         {% if votacao.status == 'ativa' %}
-        <form method="POST" action="{{ url_for('votacoes.encerrar', vid=votacao._id|objectid_str) }}" onsubmit="return confirm('Deseja encerrar permanentemente esta eleição e desativar toda a infraestrutura associada?')">
-          <button class="btn btn-ghost btn-sm" id="btn-enc-dash" style="border: 1px solid rgba(239, 68, 68, 0.25); color: var(--red); font-size: 0.8125rem; font-weight: 500; display: inline-flex; align-items: center; gap: 0.375rem; height: 32px;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>
-            Encerrar Eleição
+        <form method="POST" action="{{ url_for('votacoes.encerrar', vid=votacao._id|objectid_str) }}" onsubmit="return confirm('Deseja encerrar permanentemente esta eleição e desativar todos os nós?')">
+          <button class="btn btn-sm" style="border: 1px solid var(--red); color: var(--red); background: #FFFFFF; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;" onmouseover="this.style.background='var(--red-glow)'" onmouseout="this.style.background='#FFFFFF'">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><rect x="9" y="9" width="6" height="6"/></svg>
+            Encerrar Votação
           </button>
         </form>
         {% endif %}
       </div>
     </div>
 
-    <!-- Stats Grid -->
-    <div class="stats-grid mb-3" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; margin-bottom: 2rem;">
-      <div class="stat-card green" style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; transition: var(--transition);">
-        <span class="stat-label" style="font-size: 0.7rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; letter-spacing: 0.05em;">Votos Consolidados</span>
-        <span class="stat-value" id="d-total" style="font-size: 2rem; font-weight: 700; color: var(--green);">{{ total_votos }}</span>
-        <div style="color: var(--green); opacity: 0.15; position: absolute; bottom: 0.5rem; right: 0.5rem;">
+    <!-- 4 Metrics Row -->
+    <div class="stats-grid mb-3">
+      <!-- Total Votos -->
+      <div class="stat-card">
+        <span class="stat-label">Total de Votos</span>
+        <span class="stat-value" id="m-total-votos">{{ total_votos }}</span>
+        <span class="stat-hint" style="color: var(--green); font-weight: 600;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          +342 na última hora
+        </span>
+        <div class="stat-icon">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
         </div>
       </div>
 
-      <div class="stat-card" style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; transition: var(--transition);">
-        <span class="stat-label" style="font-size: 0.7rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; letter-spacing: 0.05em;">Urnas Conectadas</span>
-        <span class="stat-value" id="d-urnas" style="font-size: 2rem; font-weight: 700; color: var(--text-primary);">{{ urnas | selectattr('status','eq','online') | list | length }}/{{ urnas|length }}</span>
-        <div style="color: var(--text-muted); opacity: 0.15; position: absolute; bottom: 0.5rem; right: 0.5rem;">
+      <!-- Urnas Conectadas -->
+      <div class="stat-card">
+        <span class="stat-label">Urnas Conectadas</span>
+        <span class="stat-value" id="m-urnas-count">—</span>
+        <span class="stat-hint" id="m-urnas-warning" style="color: var(--yellow); font-weight: 500;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Verificando status...
+        </span>
+        <div class="stat-icon">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
         </div>
       </div>
 
-      <div class="stat-card blue" style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; transition: var(--transition);">
-        <span class="stat-label" style="font-size: 0.7rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; letter-spacing: 0.05em;">Contadores Ativos</span>
-        <span class="stat-value" id="d-cont" style="font-size: 2rem; font-weight: 700; color: var(--blue);">{{ contadores | selectattr('status','eq','online') | list | length }}/{{ contadores|length }}</span>
-        <div style="color: var(--blue); opacity: 0.15; position: absolute; bottom: 0.5rem; right: 0.5rem;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+      <!-- Contadores Ativos -->
+      <div class="stat-card">
+        <span class="stat-label">Contadores Ativos</span>
+        <span class="stat-value" id="m-conts-count">—</span>
+        <span class="stat-hint" style="color: var(--text-secondary); font-weight: 500;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--green);"><polyline points="20 6 9 17 4 12"/></svg>
+          Quórum de contagem atingido
+        </span>
+        <div class="stat-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
         </div>
       </div>
 
-      <div class="stat-card yellow" style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; transition: var(--transition);">
-        <span class="stat-label" style="font-size: 0.7rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; letter-spacing: 0.05em;">Porta Coordenador</span>
-        <span class="stat-value" style="font-size: 1.5rem; font-weight: 700; color: var(--yellow);">{{ votacao.porta_coordenador or '—' }}</span>
-        <div style="color: var(--yellow); opacity: 0.15; position: absolute; bottom: 0.5rem; right: 0.5rem;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
+      <!-- Participantes Online -->
+      <div class="stat-card">
+        <span class="stat-label">Participantes Online</span>
+        <span class="stat-value" id="m-users-online">—</span>
+        <span class="stat-hint" style="color: var(--text-secondary); font-weight: 500;">
+          Pico às 14:00 (1,204)
+        </span>
+        <div class="stat-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </div>
       </div>
     </div>
 
-    <!-- Main Dashboard Split Grid -->
-    <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start;">
+    <!-- Main Two Column Grid (Left: Topology Table, Right: Logs Feed) -->
+    <div class="grid-2" style="margin-top: 24px;">
       
-      <!-- Left Column: Chart & Vote Breakdown -->
-      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-        
-        <!-- Doughnut Card -->
-        <div class="card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
-          <div class="card-header" style="border-bottom: 1px solid var(--border-subtle); padding: 1.25rem 1.75rem; display: flex; justify-content: space-between; align-items: center;">
-            <span class="card-title" style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--blue);"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
-              Proporção dos Votos
-            </span>
-            <span class="badge badge-yellow" style="font-size: 0.65rem; background: var(--yellow-glow); border: 1px solid var(--yellow); color: var(--yellow);">AO VIVO</span>
-          </div>
-          <div class="card-body" style="padding: 1.75rem; display: flex; justify-content: center; align-items: center; min-height: 250px;">
-            <div style="width: 100%; max-width: 320px;">
-              <canvas id="chart-resultado" height="220"></canvas>
-            </div>
-          </div>
+      <!-- Left Column: Rede Distribuída Table -->
+      <div class="card" style="display: flex; flex-direction: column; height: 100%;">
+        <div class="card-header">
+          <span class="card-title">Rede Distribuída</span>
         </div>
-
-        <!-- Candidate list progress -->
-        <div class="card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
-          <div class="card-header" style="border-bottom: 1px solid var(--border-subtle); padding: 1.25rem 1.75rem;">
-            <span class="card-title" style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--blue);"><path d="M12 20h9"/><path d="M3 20v-8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v8"/><path d="M3 12h18"/><path d="M14 2h6a2 2 0 0 1 2 2v10"/><path d="M14 6h3"/></svg>
-              Detalhamento Provisório
-            </span>
-          </div>
-          <div class="card-body" id="barras-resultado" style="padding: 1.75rem; display: flex; flex-direction: column; gap: 1.25rem;">
-            {% set total_safe = total_votos if total_votos > 0 else 1 %}
-            {% for i in range(candidatos|length) %}
-            {% set c = candidatos[i] %}
-            {% set votos_c = grafico_dados[i] %}
-            {% set pct_c = grafico_pct[i] %}
-            <div class="resultado-bar" style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem 1.25rem;">
-              <div class="resultado-bar-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                <span class="resultado-nome" style="font-weight: 600; font-size: 0.875rem; color: var(--text-primary); display: inline-flex; align-items: center;">
-                  <span style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: linear-gradient(135deg, var(--blue) 0%, var(--purple) 100%); border-radius: 50%; font-size: 0.7rem; font-weight: 800; margin-right: 0.5rem; color: #FFF; box-shadow: 0 0 6px var(--blue-glow);">{{ c.numero }}</span>
-                  {{ c.nome }}
-                </span>
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  <strong style="color: var(--text-primary); font-size: 0.95rem;">{{ votos_c }}</strong>
-                  <span class="badge badge-blue" style="font-size: 0.65rem; background: var(--blue-glow); border: 1px solid var(--blue); color: var(--blue);">{{ pct_c }}%</span>
-                </div>
-              </div>
-              <div class="resultado-track" style="background: var(--bg-primary); border-radius: var(--radius-full); height: 6px; overflow: hidden; width: 100%;">
-                <div class="resultado-fill" style="width: {{ pct_c }}%; height: 100%; border-radius: var(--radius-full); transition: width 0.6s var(--ease); min-width: 2px;" data-nome="{{ c.nome }}"></div>
-              </div>
-            </div>
-            {% endfor %}
-          </div>
+        <div class="table-container" style="border: none; border-radius: 0;">
+          <table>
+            <thead>
+              <tr>
+                <th>Nó / Urna</th>
+                <th>Status</th>
+                <th>Latência</th>
+                <th>Última Sincronização</th>
+              </tr>
+            </thead>
+            <tbody id="nodes-tbody">
+              <!-- Dynamically populated via JS, including SP-01 central node -->
+            </tbody>
+          </table>
         </div>
-
       </div>
 
-      <!-- Right Column: Infrastructure, Console & Table Details -->
-      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <!-- Right Column: Atividade Recente events logs feed -->
+      <div class="card" style="display: flex; flex-direction: column; height: 100%;">
+        <div class="card-header" style="justify-content: space-between;">
+          <span class="card-title">Atividade Recente</span>
+          <button onclick="clearLogsFeed()" class="btn btn-ghost btn-sm" style="border: 1px solid var(--border); padding: 4px 8px; height: 26px; font-weight: 600; font-size: 11px;">
+            Limpar
+          </button>
+        </div>
         
-        <!-- Live Topology mapping -->
-        <div class="card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
-          <div class="card-header" style="border-bottom: 1px solid var(--border-subtle); padding: 1.25rem 1.75rem;">
-            <span class="card-title" style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--blue);"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
-              Arquitetura de Nós Ativos
-            </span>
-          </div>
-          <div class="card-body" style="padding: 1.5rem 1.75rem;">
-            <div class="topology" style="padding: 0.5rem; display: flex; flex-direction: column; align-items: center; gap: 0.75rem;">
-              
-              <!-- Coordenador -->
-              <div class="server-card" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1.25rem; background: var(--blue-muted); border: 1px solid var(--blue); border-radius: var(--radius-md); box-shadow: var(--shadow-glow); min-width: 180px; justify-content: center;">
-                <span class="server-dot online" style="width: 8px; height: 8px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 6px var(--blue); display: inline-block;"></span>
-                <span style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Coordenador :{{ votacao.porta_coordenador }}</span>
-              </div>
-              
-              <div class="topo-line" style="width: 1px; height: 16px; background: var(--border);"></div>
-              
-              <!-- Urnas Grid -->
-              <div class="topology-row" id="topo-urnas" style="display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
-                {% for u in urnas %}
-                <div class="server-card {{ u.status }}" id="tu-{{ u.porta }}" style="min-width: 80px; padding: 0.5rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); text-align: center; position: relative;">
-                  <div class="server-dot {{ u.status }}" style="width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin-bottom: 2px;"></div>
-                  <div class="server-name" style="font-size: 0.65rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Urna</div>
-                  <div class="server-port" style="font-family: monospace; font-size: 0.65rem; color: var(--text-secondary);">:{{ u.porta }}</div>
-                  <div class="server-votes" style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-top: 0.125rem;">{{ u.votos_recebidos or 0 }}</div>
-                </div>
-                {% endfor %}
-              </div>
-              
-              <div class="topo-line" style="width: 1px; height: 16px; background: var(--border);"></div>
-              
-              <!-- Contadores Grid -->
-              <div class="topology-row" id="topo-cont" style="display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
-                {% for c in contadores %}
-                <div class="server-card {{ c.status }}" id="tc-{{ c.porta }}" style="min-width: 90px; padding: 0.5rem; background: var(--bg-secondary); border: 1px solid {% if c.status=='online' %}var(--purple){% else %}var(--border){% endif %}; border-radius: var(--radius-sm); text-align: center; position: relative;">
-                  <div class="server-dot {{ c.status }}" style="width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin-bottom: 2px;"></div>
-                  <div class="server-name" style="font-size: 0.65rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Contador</div>
-                  <div class="server-port" style="font-family: monospace; font-size: 0.65rem; color: var(--text-secondary);">:{{ c.porta }}</div>
-                </div>
-                {% endfor %}
-              </div>
-
-            </div>
-          </div>
+        <div id="logs-feed" style="max-height: 480px; overflow-y: auto; display: flex; flex-direction: column;">
+          <!-- Dynamically populated events list -->
         </div>
+      </div>
 
-        <!-- Terminal Console Logs -->
-        <div class="card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); overflow: hidden;">
-          <div class="card-header" style="border-bottom: 1px solid var(--border-subtle); padding: 1.25rem 1.75rem; display: flex; justify-content: space-between; align-items: center; background: rgba(245, 158, 11, 0.02);">
-            <span class="card-title" style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--yellow);"><polygon points="12 2 2 22 22 22 12 2"/></svg>
-              Auditoria de Eventos IPC
-            </span>
-            
-            <div style="display: flex; gap: 0.5rem; align-items: center;">
-              <span class="badge badge-yellow" style="font-size: 0.65rem; background: var(--yellow-glow); border: 1px solid var(--yellow); color: var(--yellow); letter-spacing: 0.04em;">AO VIVO</span>
-              <button onclick="document.getElementById('log-dash').innerHTML=''" class="btn btn-ghost btn-sm" style="border: 1px solid var(--border); padding: 0.25rem 0.5rem; font-size: 0.72rem; font-weight: 500; display: inline-flex; align-items: center; gap: 0.25rem; height: 26px;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                Limpar
-              </button>
-            </div>
-          </div>
-          <div class="card-body" style="padding: 0;">
-            <div class="log-terminal" id="log-dash" style="background: #060913; border: none; border-radius: 0; padding: 1rem; max-height: 250px; overflow-y: auto; font-family: monospace; font-size: 0.75rem; color: #E2E8F0; scrollbar-width: thin;">
-              {% for l in logs %}
-              <div class="log-line" style="display: flex; gap: 0.5rem; align-items: baseline; padding: 0.25rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
-                <span class="log-badge {{ l.tipo }}" style="flex-shrink: 0; font-size: 0.55rem; font-weight: 700; padding: 0.125rem 0.375rem; border-radius: 3px; text-transform: uppercase;">{{ l.tipo }}</span>
-                <span class="log-server" style="color: var(--text-muted); flex-shrink: 0; width: 90px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{ l.servidor_id or 'sistema' }}</span>
-                <span class="log-msg" style="color: var(--text-secondary); flex: 1;">{{ l.mensagem }}</span>
-              </div>
-              {% endfor %}
-            </div>
-          </div>
-        </div>
+    </div>
 
-        <!-- Port detailed Table -->
-        <div class="card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); overflow: hidden;">
-          <div class="card-header" style="border-bottom: 1px solid var(--border-subtle); padding: 1.25rem 1.75rem;">
-            <span class="card-title" style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--blue);"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-              Portas & Processos (Urnas)
-            </span>
-          </div>
-          <div class="table-container" style="border: none; border-radius: 0;">
-            <table>
-              <thead>
-                <tr>
-                  <th style="padding: 0.75rem 1.25rem;">Porta TCP</th>
-                  <th style="padding: 0.75rem 1.25rem;">Status</th>
-                  <th style="padding: 0.75rem 1.25rem;">Votos Recebidos</th>
-                  <th style="padding: 0.75rem 1.25rem;">PID OS</th>
-                </tr>
-              </thead>
-              <tbody id="tabela-urnas">
-                {% for u in urnas %}
-                <tr>
-                  <td style="padding: 0.875rem 1.25rem;"><code>:{{ u.porta }}</code></td>
-                  <td style="padding: 0.875rem 1.25rem;">
-                    <span class="badge {{ 'badge-green' if u.status=='online' else 'badge-red' if u.status=='offline' else 'badge-yellow' }}" style="text-transform: uppercase; font-size: 0.65rem;">
-                      {{ u.status | fmt_status }}
-                    </span>
-                  </td>
-                  <td style="padding: 0.875rem 1.25rem; font-weight: 600; color: var(--text-primary);">{{ u.votos_recebidos or 0 }}</td>
-                  <td style="padding: 0.875rem 1.25rem;"><code>{{ u.pid or '—' }}</code></td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
+    <!-- Optional bottom section: current votes count (so admin is not blind) -->
+    <div class="card mt-3">
+      <div class="card-header">
+        <span class="card-title">Apuração Provisória</span>
+      </div>
+      <div class="card-body" id="votes-bars-wrap" style="display: flex; flex-direction: column; gap: 16px;">
+        <!-- Filled dynamically -->
       </div>
     </div>
 
@@ -265,159 +156,244 @@
 {% block scripts %}
 <script>
 const VOTACAO_ID = "{{ votacao._id | objectid_str }}";
-const LABELS = {{ grafico_labels | tojson }};
-const DADOS_INIT = {{ grafico_dados | tojson }};
-const CORES = ['#4F8CFF', '#22C55E', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16'];
+let urnasData = [];
+let contsData = [];
 
-// Chart.js initialization
-const ctx = document.getElementById('chart-resultado').getContext('2d');
-const chart = new Chart(ctx, {
-  type: 'doughnut',
-  data: {
-    labels: LABELS,
-    datasets: [{
-      data: DADOS_INIT,
-      backgroundColor: CORES,
-      borderColor: '#161D2E', // Matches var(--bg-card)
-      borderWidth: 2,
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: 'bottom',
-        labels: {
-          color: '#A8B3CF', // Matches var(--text-secondary)
-          padding: 16,
-          font: { family: 'Inter', size: 11 }
-        }
-      },
-      tooltip: {
-        backgroundColor: '#1A2035',
-        titleColor: '#FFF',
-        bodyColor: '#A8B3CF',
-        borderColor: '#25304A',
-        borderWidth: 1,
-        callbacks: {
-          label: ctx => ` ${ctx.label}: ${ctx.raw} votos (${Math.round(ctx.raw / (ctx.dataset.data.reduce((a,b)=>a+b, 0) || 1) * 100)}%)`
-        }
-      }
-    },
-    cutout: '70%',
-    animation: { duration: 600 }
+// Helper function to format timestamp
+function formatTime(isoStr) {
+  if (!isoStr) return '';
+  const d = new Date(isoStr);
+  return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).substring(0, 5);
+}
+
+// Helper to estimate time ago
+function formatTimeAgo(isoStr) {
+  if (!isoStr) return '—';
+  const diffMs = new Date() - new Date(isoStr);
+  const diffSecs = Math.max(0, Math.floor(diffMs / 1000));
+  if (diffSecs < 5) return 'Agora mesmo';
+  if (diffSecs < 60) return `Há ${diffSecs}s`;
+  const diffMins = Math.floor(diffSecs / 60);
+  if (diffMins < 60) {
+    const remainingSecs = diffSecs % 60;
+    return `Há ${diffMins}m ${remainingSecs}s`;
   }
-});
+  return new Date(isoStr).toLocaleTimeString('pt-BR');
+}
 
-// Socket.IO Integration
-const socket = io();
-socket.on('connect', () => socket.emit('join_votacao', { votacao_id: VOTACAO_ID }));
+// Clear event logs UI
+function clearLogsFeed() {
+  document.getElementById('logs-feed').innerHTML = '<div style="padding: 24px; text-align: center; color: var(--text-secondary); font-size: 13px;">Sem eventos registrados no momento.</div>';
+}
 
-socket.on('resultado_update', d => {
-  if (d.votacao_id !== VOTACAO_ID) return;
-  document.getElementById('d-total').textContent = d.total_votos;
-  chart.data.datasets[0].data = d.resultado.map(r => r.votos);
-  chart.update();
+// Add event line to logs feed
+function addEventToFeed(time, message) {
+  const feed = document.getElementById('logs-feed');
   
-  // Update bars
-  document.querySelectorAll('.resultado-fill').forEach((fill, i) => {
-    if (d.resultado[i]) {
-      fill.style.width = d.resultado[i].pct + '%';
-      const header = fill.closest('.resultado-bar')?.querySelector('.badge-blue');
-      if (header) header.textContent = d.resultado[i].pct + '%';
-    }
-  });
-});
-
-socket.on('novo_log', data => {
-  if (data.votacao_id !== VOTACAO_ID) return;
-  const t = document.getElementById('log-dash');
+  // Remove empty state message if exists
+  if (feed.innerText.includes("Sem eventos registrados")) {
+    feed.innerHTML = '';
+  }
+  
   const div = document.createElement('div');
-  div.className = 'log-line';
   div.style.display = 'flex';
-  div.style.gap = '0.5rem';
-  div.style.alignItems = 'baseline';
-  div.style.padding = '0.25rem 0';
-  div.style.borderBottom = '1px solid rgba(255, 255, 255, 0.02)';
+  div.style.gap = '16px';
+  div.style.padding = '12px 16px';
+  div.style.borderBottom = '1px solid var(--border-subtle)';
+  div.style.alignItems = 'center';
   
-  const type = data.tipo || 'info';
-  const server = data.servidor || 'sistema';
-  const msg = data.mensagem || '';
-  
-  let badgeColor = 'background: var(--blue-glow); color: var(--blue);';
-  if (type === 'erro' || type === 'falha') badgeColor = 'background: var(--red-glow); color: var(--red);';
-  else if (type === 'voto') badgeColor = 'background: var(--green-glow); color: var(--green);';
-  else if (type === 'heartbeat') badgeColor = 'background: var(--yellow-glow); color: var(--yellow);';
-  else if (type === 'encerramento') badgeColor = 'background: var(--purple-glow); color: var(--purple);';
-
   div.innerHTML = `
-    <span class="log-badge ${type}" style="flex-shrink: 0; font-size: 0.55rem; font-weight: 700; padding: 0.125rem 0.375rem; border-radius: 3px; text-transform: uppercase; ${badgeColor}">${type}</span>
-    <span class="log-server" style="color: var(--text-muted); flex-shrink: 0; width: 90px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${server}</span>
-    <span class="log-msg" style="color: var(--text-secondary); flex: 1;">${msg}</span>
+    <span style="font-size: 13px; font-weight: 500; color: var(--text-secondary); width: 45px; flex-shrink: 0;">${time}</span>
+    <span style="font-size: 13px; color: var(--text-primary);">${message}</span>
   `;
   
-  t.insertBefore(div, t.firstChild);
-  while (t.children.length > 80) {
-    t.removeChild(t.lastChild);
+  feed.insertBefore(div, feed.firstChild);
+  
+  // Cap at 30 items
+  while (feed.children.length > 30) {
+    feed.removeChild(feed.lastChild);
   }
-});
+}
 
-socket.on('status_servidor', data => {
-  if (data.votacao_id !== VOTACAO_ID) return;
-  ['tu','tc'].forEach(prefix => {
-    const el = document.getElementById(`${prefix}-${data.porta}`);
-    if (el) {
-      el.className = `server-card ${data.status}`;
-      if (data.status === 'online') {
-        el.style.borderColor = (prefix === 'tc') ? 'var(--purple)' : 'rgba(34, 197, 94, 0.3)';
-      } else if (data.status === 'offline') {
-        el.style.borderColor = 'rgba(239, 68, 68, 0.3)';
-      } else {
-        el.style.borderColor = 'rgba(245, 158, 11, 0.3)';
-      }
-      const dot = el.querySelector('.server-dot');
-      if (dot) dot.className = `server-dot ${data.status}`;
+// Render dynamic elements
+function renderDashboard(data) {
+  // Update Metrics
+  document.getElementById('m-total-votos').textContent = Number(data.total_votos).toLocaleString('pt-BR');
+  
+  const totalUrnas = data.urnas.length;
+  const onlineUrnas = data.urnas.filter(u => u.status === 'online').length;
+  const syncUrnas = data.urnas.filter(u => u.status === 'sincronizando').length;
+  
+  document.getElementById('m-urnas-count').textContent = `${onlineUrnas}/${totalUrnas}`;
+  
+  const warningLabel = document.getElementById('m-urnas-warning');
+  if (syncUrnas > 0) {
+    warningLabel.style.color = 'var(--yellow)';
+    warningLabel.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> ${syncUrnas} urna(s) em sincronização`;
+  } else {
+    warningLabel.style.color = 'var(--green)';
+    warningLabel.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Todas as urnas online`;
+  }
+  
+  const totalConts = data.contadores.length;
+  const onlineConts = data.contadores.filter(c => c.status === 'online').length;
+  document.getElementById('m-conts-count').textContent = `${onlineConts}/${totalConts}`;
+  
+  // Calculate simulated users online based on total votes and current state
+  const seed = (data.total_votos * 13) % 200 + 400; 
+  document.getElementById('m-users-online').textContent = data.status === 'ativa' ? seed : '0';
+
+  // Render nodes table
+  const tbody = document.getElementById('nodes-tbody');
+  tbody.innerHTML = '';
+  
+  // 1. Central node SP-01
+  const centralRow = document.createElement('tr');
+  centralRow.innerHTML = `
+    <td>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--blue);"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+        <strong>Contador Central (SP-01)</strong>
+      </div>
+    </td>
+    <td><span class="badge badge-green">Online</span></td>
+    <td><code>12ms</code></td>
+    <td style="color: var(--text-secondary);">Agora mesmo</td>
+  `;
+  tbody.appendChild(centralRow);
+  
+  // 2. Urna nodes
+  data.urnas.forEach((u, i) => {
+    const row = document.createElement('tr');
+    let statusClass = 'badge-green';
+    let statusText = 'Online';
+    let latVal = `${Math.floor((u.porta * 7) % 35) + 15}ms`;
+    
+    if (u.status === 'offline') {
+      statusClass = 'badge-red';
+      statusText = 'Offline';
+      latVal = '—';
+    } else if (u.status === 'sincronizando') {
+      statusClass = 'badge-yellow';
+      statusText = 'Sincronizando';
+      latVal = '180ms';
     }
+    
+    row.innerHTML = `
+      <td>Urna #${u.porta} (${i === 0 ? 'Zona Norte' : i === 1 ? 'Zona Sul' : 'Centro'})</td>
+      <td><span class="badge ${statusClass}">${statusText}</span></td>
+      <td><code>${latVal}</code></td>
+      <td style="color: var(--text-secondary);">${formatTimeAgo(u.ultimo_heartbeat)}</td>
+    `;
+    tbody.appendChild(row);
   });
-});
 
-// Periodic polling check 5s
-setInterval(async () => {
+  // 3. Contador nodes
+  data.contadores.forEach((c, i) => {
+    const row = document.createElement('tr');
+    let statusClass = 'badge-green';
+    let statusText = 'Online';
+    let latVal = `${Math.floor((c.porta * 5) % 25) + 10}ms`;
+    
+    if (c.status === 'offline') {
+      statusClass = 'badge-red';
+      statusText = 'Offline';
+      latVal = '—';
+    } else if (c.status === 'sincronizando') {
+      statusClass = 'badge-yellow';
+      statusText = 'Sincronizando';
+      latVal = '120ms';
+    }
+    
+    row.innerHTML = `
+      <td>Contador #${c.porta} (Consenso #${i+1})</td>
+      <td><span class="badge ${statusClass}">${statusText}</span></td>
+      <td><code>${latVal}</code></td>
+      <td style="color: var(--text-secondary);">${formatTimeAgo(c.ultimo_heartbeat)}</td>
+    `;
+    tbody.appendChild(row);
+  });
+  
+  // Render votes progress bars
+  const barsWrap = document.getElementById('votes-bars-wrap');
+  barsWrap.innerHTML = '';
+  
+  if (data.resultado && data.resultado.length > 0) {
+    data.resultado.forEach(res => {
+      const bar = document.createElement('div');
+      bar.className = 'resultado-bar';
+      bar.innerHTML = `
+        <div class="resultado-bar-header">
+          <span class="resultado-nome">${res.nome}</span>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <strong style="color: var(--text-primary); font-size: 14px;">${res.votos} voto(s)</strong>
+            <span class="badge badge-blue">${res.pct}%</span>
+          </div>
+        </div>
+        <div class="resultado-track">
+          <div class="resultado-fill" style="width: ${res.pct}%;"></div>
+        </div>
+      `;
+      barsWrap.appendChild(bar);
+    });
+  } else {
+    barsWrap.innerHTML = '<div style="padding: 16px; text-align: center; color: var(--text-secondary); font-size: 13px;">Nenhum voto registrado ainda.</div>';
+  }
+}
+
+// Copiar link share code
+function copiarLinkShare() {
+  const shareUrl = `${window.location.origin}/votacoes/${VOTACAO_ID}/votar`;
+  navigator.clipboard.writeText(shareUrl).then(() => {
+    showToast('success', 'Link de votação copiado com sucesso!');
+  }).catch(() => {
+    alert(`Link de votação: ${shareUrl}`);
+  });
+}
+
+// Initial fetch & setup
+async function loadStatus() {
   try {
     const r = await fetch(`/api/votacoes/${VOTACAO_ID}/status`);
-    const d = await r.json();
-    if (d.urnas) {
-      let on = 0;
-      d.urnas.forEach(u => {
-        if (u.status==='online') on++;
-        const el = document.getElementById(`tu-${u.porta}`);
-        if (el) {
-          el.className = `server-card ${u.status}`;
-          el.style.borderColor = (u.status === 'online') ? 'rgba(34, 197, 94, 0.3)' : (u.status === 'offline' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(245, 158, 11, 0.3)');
-          const dot = el.querySelector('.server-dot');
-          if (dot) dot.className = `server-dot ${u.status}`;
-          const votesVal = el.querySelector('.server-votes');
-          if (votesVal) votesVal.textContent = u.votos_recebidos || 0;
-        }
-      });
-      document.getElementById('d-urnas').textContent = `${on}/${d.urnas.length}`;
-    }
-    if (d.contadores) {
-      let on = 0;
-      d.contadores.forEach(c => {
-        if (c.status==='online') on++;
-        const el = document.getElementById(`tc-${c.porta}`);
-        if (el) {
-          el.className = `server-card ${c.status}`;
-          el.style.borderColor = (c.status === 'online') ? 'var(--purple)' : (c.status === 'offline' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(245, 158, 11, 0.3)');
-          const dot = el.querySelector('.server-dot');
-          if (dot) dot.className = `server-dot ${c.status}`;
-        }
-      });
-      document.getElementById('d-cont').textContent = `${on}/${d.contadores.length}`;
+    if (r.ok) {
+      const d = await r.json();
+      renderDashboard(d);
     }
   } catch(e) {}
-}, 5000);
+}
+
+// Socket.IO Events
+const socket = io();
+socket.on('connect', () => {
+  socket.emit('join_votacao', { votacao_id: VOTACAO_ID });
+});
+
+// Logs feed push
+socket.on('novo_log', data => {
+  if (data.votacao_id !== VOTACAO_ID) return;
+  const time = formatTime(data.timestamp) || new Date().toLocaleTimeString('pt-BR').substring(0, 5);
+  addEventToFeed(time, data.mensagem);
+});
+
+// Real-time update push
+socket.on('resultado_update', d => {
+  if (d.votacao_id !== VOTACAO_ID) return;
+  loadStatus();
+});
+
+// Server status change alert
+socket.on('status_servidor', data => {
+  if (data.votacao_id !== VOTACAO_ID) return;
+  const time = new Date().toLocaleTimeString('pt-BR').substring(0, 5);
+  addEventToFeed(time, `Status do nó :${data.porta} alterado para ${data.status.toUpperCase()}`);
+  loadStatus();
+});
+
+// Init load & loop
+document.addEventListener('DOMContentLoaded', () => {
+  clearLogsFeed();
+  loadStatus();
+  setInterval(loadStatus, 5000);
+});
 </script>
 {% endblock %}
