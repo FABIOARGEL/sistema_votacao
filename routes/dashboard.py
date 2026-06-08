@@ -10,33 +10,6 @@ from models import get_db
 dashboard_bp = Blueprint("dashboard", __name__)
 
 
-@dashboard_bp.route("/dashboard")
-@login_required
-def index():
-    """Dashboard pessoal: votações do usuário + stats gerais."""
-    minhas = VotacaoModel.listar_por_criador(current_user.id)
-
-    # Stats globais
-    db = get_db()
-    total_votacoes = db.votacoes.count_documents({})
-    total_usuarios = db.users.count_documents({})
-    total_votos    = db.votos.count_documents({"confirmado": True})
-    urnas_online   = db.urnas.count_documents({"status": "online"})
-    cont_online    = db.contadores.count_documents({"status": "online"})
-
-    # Logs recentes do sistema (todas votações)
-    logs_recentes = list(db.logs.find().sort("timestamp", -1).limit(30))
-
-    return render_template(
-        "dashboard/index.html",
-        minhas=minhas,
-        total_votacoes=total_votacoes,
-        total_usuarios=total_usuarios,
-        total_votos=total_votos,
-        urnas_online=urnas_online,
-        cont_online=cont_online,
-        logs_recentes=logs_recentes,
-    )
 
 
 @dashboard_bp.route("/dashboard/votacao/<vid>")
@@ -46,11 +19,11 @@ def votacao_detail(vid: str):
     votacao = VotacaoModel.por_id(vid)
     if not votacao:
         flash("Votação não encontrada.", "danger")
-        return redirect(url_for("dashboard.index"))
+        return redirect(url_for("votacoes.lista"))
 
     if str(votacao.get("criador_id", "")) != str(current_user.id):
         flash("Sem permissão para acessar este dashboard.", "danger")
-        return redirect(url_for("dashboard.index"))
+        return redirect(url_for("votacoes.lista"))
 
     candidatos = CandidatoModel.por_votacao(vid)
     urnas      = ServidorModel.urnas_por_votacao(vid)
