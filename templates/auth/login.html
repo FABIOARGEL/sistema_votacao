@@ -2,67 +2,12 @@
 {% block title %}Entrar — VotoDistribuído{% endblock %}
 
 {% block content %}
-<div class="auth-split-page">
+<div class="auth-page">
 
-  <!-- LEFT: Brand Panel -->
-  <div class="auth-brand-panel">
-    <div class="auth-brand-content">
-      <div class="auth-brand-logo">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M9 12L11 14L15 10" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <span>VotoDistribuído</span>
-      </div>
 
-      <div class="auth-brand-body">
-        <h2 class="auth-brand-title">Bem-vindo de volta à plataforma</h2>
-        <p class="auth-brand-sub">Acesse sua conta para gerenciar votações distribuídas com total segurança e transparência.</p>
-
-        <ul class="auth-feature-list">
-          <li>
-            <div class="auth-feature-icon green">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </div>
-            <div>
-              <div class="auth-feature-title">Criptografia de ponta a ponta</div>
-              <div class="auth-feature-desc">Seus dados e votos protegidos em trânsito e em repouso</div>
-            </div>
-          </li>
-          <li>
-            <div class="auth-feature-icon blue">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
-            </div>
-            <div>
-              <div class="auth-feature-title">Rede de nós distribuídos</div>
-              <div class="auth-feature-desc">Tolerância a falhas com replicação automática de dados</div>
-            </div>
-          </li>
-          <li>
-            <div class="auth-feature-icon purple">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-            </div>
-            <div>
-              <div class="auth-feature-title">Resultados em tempo real</div>
-              <div class="auth-feature-desc">Acompanhe apurações ao vivo com WebSocket</div>
-            </div>
-          </li>
-        </ul>
-      </div>
-
-      <div class="auth-brand-footer">
-        © 2026 VotoDistribuído · Plataforma Segura de Votação Online
-      </div>
-    </div>
-  </div>
-
-  <!-- RIGHT: Form Panel -->
-  <div class="auth-form-panel">
-    <div class="auth-form-inner fade-in">
-      <div class="auth-form-header">
-        <h1 class="auth-form-title">Acessar conta</h1>
-        <p class="auth-form-sub">Entre com suas credenciais para continuar</p>
-      </div>
+  <div class="auth-card fade-in">
+    <h1 class="auth-title">Acessar conta</h1>
+    <p class="auth-subtitle">Entre com suas credenciais para continuar</p>
 
       <!-- Google OAuth -->
       <a href="{{ url_for('auth.google_login') }}" class="btn btn-ghost btn-full" id="btn-google-login" style="margin-bottom: 4px; height: 44px;">
@@ -106,13 +51,11 @@
         </button>
       </form>
 
-      <p class="auth-footer-link">
-        Não tem uma conta?
-        <a href="{{ url_for('auth.register') }}">Criar conta grátis</a>
-      </p>
-    </div>
+    <p class="auth-footer-link">
+      Não tem uma conta?
+      <a href="{{ url_for('auth.register') }}">Criar conta grátis</a>
+    </p>
   </div>
-
 </div>
 {% endblock %}
 

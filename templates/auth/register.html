@@ -2,81 +2,10 @@
 {% block title %}Criar Conta — VotoDistribuído{% endblock %}
 
 {% block content %}
-<div class="auth-split-page">
-
-  <!-- LEFT: Brand Panel -->
-  <div class="auth-brand-panel">
-    <div class="auth-brand-content">
-      <div class="auth-brand-logo">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M9 12L11 14L15 10" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <span>VotoDistribuído</span>
-      </div>
-
-      <div class="auth-brand-body">
-        <h2 class="auth-brand-title">Crie sua conta em segundos</h2>
-        <p class="auth-brand-sub">Junte-se à plataforma de votação distribuída mais segura do Brasil.</p>
-
-        <!-- Testimonial / Social Proof -->
-        <div class="auth-social-proof">
-          <div class="auth-proof-avatars">
-            <div class="auth-proof-avatar" style="background: linear-gradient(135deg, #2563EB, #7C3AED);">A</div>
-            <div class="auth-proof-avatar" style="background: linear-gradient(135deg, #16A34A, #059669);">B</div>
-            <div class="auth-proof-avatar" style="background: linear-gradient(135deg, #EA580C, #DC2626);">C</div>
-            <div class="auth-proof-avatar" style="background: linear-gradient(135deg, #7C3AED, #4F46E5);">D</div>
-          </div>
-          <div>
-            <div class="auth-proof-text">Confiado por organizações em todo o Brasil</div>
-            <div class="auth-proof-sub">Eleições, assembleias e pesquisas corporativas</div>
-          </div>
-        </div>
-
-        <ul class="auth-feature-list">
-          <li>
-            <div class="auth-feature-icon blue">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-            </div>
-            <div>
-              <div class="auth-feature-title">Cadastro 100% gratuito</div>
-              <div class="auth-feature-desc">Sem custos ocultos para criar e gerenciar votações</div>
-            </div>
-          </li>
-          <li>
-            <div class="auth-feature-icon green">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </div>
-            <div>
-              <div class="auth-feature-title">Pronto em menos de 5 minutos</div>
-              <div class="auth-feature-desc">Configure sua primeira votação distribuída rapidamente</div>
-            </div>
-          </li>
-          <li>
-            <div class="auth-feature-icon purple">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-            </div>
-            <div>
-              <div class="auth-feature-title">Login via Google disponível</div>
-              <div class="auth-feature-desc">Acesso rápido com sua conta Google existente</div>
-            </div>
-          </li>
-        </ul>
-      </div>
-
-      <div class="auth-brand-footer">
-        © 2026 VotoDistribuído · Plataforma Segura de Votação Online
-      </div>
-    </div>
-  </div>
-
-  <!-- RIGHT: Form Panel -->
-  <div class="auth-form-panel">
-    <div class="auth-form-inner fade-in">
-      <div class="auth-form-header">
-        <h1 class="auth-form-title">Criar nova conta</h1>
-        <p class="auth-form-sub">Preencha os campos abaixo para começar</p>
-      </div>
+<div class="auth-page">
+  <div class="auth-card fade-in">
+    <h1 class="auth-title">Criar nova conta</h1>
+    <p class="auth-subtitle">Preencha os campos abaixo para começar</p>
 
       <!-- Google OAuth -->
       <a href="{{ url_for('auth.google_login') }}" class="btn btn-ghost btn-full" id="btn-google-register" style="margin-bottom: 4px; height: 44px;">
@@ -136,13 +65,11 @@
         </button>
       </form>
 
-      <p class="auth-footer-link">
-        Já tem uma conta?
-        <a href="{{ url_for('auth.login') }}">Entrar agora</a>
-      </p>
-    </div>
+    <p class="auth-footer-link">
+      Já tem uma conta?
+      <a href="{{ url_for('auth.login') }}">Entrar agora</a>
+    </p>
   </div>
-
 </div>
 {% endblock %}
 
