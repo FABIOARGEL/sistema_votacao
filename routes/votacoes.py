@@ -14,7 +14,7 @@ from bson import ObjectId
 from models.votacao import VotacaoModel, CandidatoModel, VotoModel, LogModel, ServidorModel
 from models.user import UserModel
 from core.port_manager import alocar_portas
-from core import obter_urna, enviar_voto, status_coordenador, encerrar_votacao, status_contador
+from core import obter_urna, enviar_voto, status_coordenador, encerrar_votacao, status_contador, reativar_infraestrutura
 
 votacoes_bp = Blueprint("votacoes", __name__)
 
@@ -26,7 +26,10 @@ def _parse_dt(s: str) -> datetime | None:
     if not s:
         return None
     try:
-        return datetime.fromisoformat(s).replace(tzinfo=timezone.utc)
+        # datetime-local do formulário vem sem timezone (horário local do usuário).
+        # Não forçamos UTC aqui porque causaria deslocamento de timezone.
+        # Armazenamos como naive datetime e comparamos com UTC no momento da validação.
+        return datetime.fromisoformat(s)
     except Exception:
         return None
 
@@ -232,8 +235,16 @@ def votar(vid: str):
         # Obter urna balanceada
         porta_urna = obter_urna(porta_coord)
         if not porta_urna:
-            flash("Nenhuma urna disponível no momento. Tente novamente.", "danger")
-            return render_template("votacoes/votar.html", votacao=votacao, candidatos=candidatos, mostrar_resultados=False, is_criador=is_criador)
+            # Tentar reativar infraestrutura automaticamente
+            reativado = reativar_infraestrutura(votacao)
+            if reativado:
+                # Aguardar urnas voltarem online (máx 3s)
+                import time
+                time.sleep(3)
+                porta_urna = obter_urna(porta_coord)
+            if not porta_urna:
+                flash("Nenhuma urna disponível no momento. A infraestrutura está reiniciando automaticamente. Tente novamente em alguns segundos.", "warning")
+                return render_template("votacoes/votar.html", votacao=votacao, candidatos=candidatos, mostrar_resultados=False, is_criador=is_criador)
 
         # Enviar voto
         resp = enviar_voto(porta_urna, vid, current_user.id, candidato_id)

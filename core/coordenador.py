@@ -50,10 +50,11 @@ _processos_contadores = []  # Popen
 _ids_urnas            = []  # ObjectId MongoDB
 _ids_contadores       = []  # ObjectId MongoDB
 _ultimo_heartbeat     = {}  # porta -> datetime
-_status_servidores    = {}  # porta -> "online"|"offline"
+_status_servidores    = {}  # porta -> "online"|"offline"|"reiniciando"
 _urna_idx             = 0   # round-robin
 _lock_rr              = threading.Lock()
 _rodando              = True
+_reiniciando          = set()  # portas de urnas em reinício
 
 
 # ---------------------------------------------------------------------------
@@ -164,6 +165,71 @@ def _spawn_processos():
 
 
 # ---------------------------------------------------------------------------
+# Reinício automático de urna
+# ---------------------------------------------------------------------------
+def _reiniciar_urna(porta: int):
+    """Reinicia uma urna que ficou offline."""
+    if porta in _reiniciando:
+        return
+    _reiniciando.add(porta)
+    _status_servidores[porta] = "reiniciando"
+
+    try:
+        db = _db()
+        urna_script = os.path.join(os.path.dirname(__file__), "urna.py")
+        python_exec = sys.executable
+
+        # Buscar urna_id existente no MongoDB
+        urna_doc = db.urnas.find_one({
+            "votacao_id": ObjectId(VOTACAO_ID),
+            "porta": porta,
+        })
+        if not urna_doc:
+            _log("erro", f"Urna:{porta} não encontrada no MongoDB para reinício")
+            _reiniciando.discard(porta)
+            return
+
+        urna_id = str(urna_doc["_id"])
+
+        # Atualizar status para reiniciando
+        db.urnas.update_one(
+            {"_id": ObjectId(urna_id)},
+            {"$set": {"status": "reiniciando", "ultimo_heartbeat": datetime.now(timezone.utc)}}
+        )
+
+        # Obter portas dos contadores
+        portas_contadores = [c["porta"] for c in db.contadores.find(
+            {"votacao_id": ObjectId(VOTACAO_ID), "porta": {"$in": PORTAS_CONTADORES}}
+        )]
+        if not portas_contadores:
+            portas_contadores = PORTAS_CONTADORES
+
+        # Spawnar nova urna
+        args = [
+            python_exec, urna_script,
+            VOTACAO_ID, urna_id, str(porta), str(PORTA_COORD),
+        ] + [str(p) for p in portas_contadores]
+        proc = subprocess.Popen(args)
+
+        # Atualizar lista de processos na posição correta
+        if porta in PORTAS_URNAS:
+            idx = PORTAS_URNAS.index(porta)
+            if idx < len(_processos_urnas):
+                _processos_urnas[idx] = proc
+            else:
+                _processos_urnas.append(proc)
+
+        _ultimo_heartbeat[porta] = datetime.now(timezone.utc)
+
+        _log("info", f"Urna:{porta} reiniciada com sucesso (pid={proc.pid})")
+
+    except Exception as e:
+        _log("erro", f"Falha ao reiniciar urna:{porta} — {e}")
+    finally:
+        _reiniciando.discard(porta)
+
+
+# ---------------------------------------------------------------------------
 # Monitor de heartbeat
 # ---------------------------------------------------------------------------
 def _monitor_heartbeat():
@@ -173,21 +239,29 @@ def _monitor_heartbeat():
         for porta, ultimo in list(_ultimo_heartbeat.items()):
             delta = (agora - ultimo).total_seconds()
             status_atual = _status_servidores.get(porta)
-            if delta > timeout and status_atual != "offline":
-                _status_servidores[porta] = "offline"
-                # Detectar tipo de servidor
+            if delta > timeout and status_atual not in ("offline", "reiniciando"):
                 tipo = "urna" if porta in PORTAS_URNAS else "contador"
                 _log("falha", f"{tipo.capitalize()}:{porta} offline! Sem heartbeat há {delta:.0f}s")
-                # Atualizar MongoDB
-                col = "urnas" if tipo == "urna" else "contadores"
-                try:
-                    _db()[col].update_one(
-                        {"votacao_id": ObjectId(VOTACAO_ID), "porta": porta},
-                        {"$set": {"status": "offline"}}
-                    )
-                except Exception:
-                    pass
-            elif delta <= timeout and status_atual == "offline":
+
+                if tipo == "urna":
+                    # Reiniciar urna automaticamente
+                    _status_servidores[porta] = "reiniciando"
+                    threading.Thread(
+                        target=_reiniciar_urna,
+                        args=(porta,),
+                        daemon=True
+                    ).start()
+                else:
+                    _status_servidores[porta] = "offline"
+                    try:
+                        _db().contadores.update_one(
+                            {"votacao_id": ObjectId(VOTACAO_ID), "porta": porta},
+                            {"$set": {"status": "offline"}}
+                        )
+                    except Exception:
+                        pass
+
+            elif delta <= timeout and status_atual in ("offline", "reiniciando"):
                 _status_servidores[porta] = "online"
                 _log("info", f"Servidor:{porta} recuperado após {delta:.0f}s")
 
@@ -242,7 +316,13 @@ def _processar(conn: socket.socket):
             portas_online = [p for p in PORTAS_URNAS
                              if _status_servidores.get(p) == "online"]
             if not portas_online:
-                conn.send(json.dumps({"status": "erro", "motivo": "Nenhuma urna disponível"}).encode())
+                # Verificar se há urnas reiniciando
+                reiniciando = [p for p in PORTAS_URNAS
+                               if _status_servidores.get(p) == "reiniciando"]
+                if reiniciando:
+                    conn.send(json.dumps({"status": "erro", "motivo": "Urnas reiniciando automaticamente. Aguarde..."}).encode())
+                else:
+                    conn.send(json.dumps({"status": "erro", "motivo": "Nenhuma urna disponível"}).encode())
                 return
             with _lock_rr:
                 _urna_idx = _urna_idx % len(portas_online)
@@ -258,6 +338,7 @@ def _processar(conn: socket.socket):
                 "porta":      PORTA_COORD,
                 "urnas":      {str(p): _status_servidores.get(p, "desconhecido") for p in PORTAS_URNAS},
                 "contadores": {str(p): _status_servidores.get(p, "desconhecido") for p in PORTAS_CONTADORES},
+                "urnas_reiniciando": [p for p in PORTAS_URNAS if _status_servidores.get(p) == "reiniciando"],
             }
             conn.send(json.dumps(status).encode())
 

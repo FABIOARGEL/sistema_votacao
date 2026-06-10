@@ -108,10 +108,23 @@ def _validar(msg: dict) -> tuple[bool, str]:
     agora = datetime.now(timezone.utc)
     inicio = votacao.get("inicio")
     fim    = votacao.get("fim")
-    if inicio and inicio.replace(tzinfo=timezone.utc) > agora:
+
+    def _ensure_utc(dt):
+        """Garante que datetime tenha timezone UTC."""
+        if dt is None:
+            return None
+        if hasattr(dt, 'tzinfo') and dt.tzinfo is None:
+            return dt.replace(tzinfo=timezone.utc)
+        return dt
+
+    inicio = _ensure_utc(inicio)
+    fim = _ensure_utc(fim)
+
+    if inicio and inicio > agora:
         return False, "Votação ainda não iniciou"
-    if fim and fim.replace(tzinfo=timezone.utc) < agora:
-        return False, "Votação já encerrou"
+    # Não validamos fim aqui — o status da votação é a fonte da verdade.
+    # A validação de horário é feita pelo app Flask na rota de voto.
+    # Isso evita erros de timezone entre o form (horário local) e UTC.
 
     # Eleitor já votou?
     ja_votou = db.votos.find_one({
