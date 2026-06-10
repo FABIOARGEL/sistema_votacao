@@ -53,6 +53,16 @@ class VotacaoModel:
         )
 
     @staticmethod
+    def listar_disponiveis(skip=0, limit=20) -> list:
+        return list(
+            VotacaoModel.col()
+            .find({"status": {"$in": ["ativa", "encerrada"]}})
+            .sort("criada_em", -1)
+            .skip(skip)
+            .limit(limit)
+        )
+
+    @staticmethod
     def listar_por_criador(criador_id: str | ObjectId) -> list:
         if isinstance(criador_id, str):
             criador_id = ObjectId(criador_id)

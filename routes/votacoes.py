@@ -37,9 +37,9 @@ def _parse_dt(s: str) -> datetime | None:
 @votacoes_bp.route("/")
 @votacoes_bp.route("/votacoes")
 def lista():
-    publicas    = VotacaoModel.listar_publicas()
+    disponiveis = VotacaoModel.listar_disponiveis()
     minhas      = VotacaoModel.listar_por_criador(current_user.id) if current_user.is_authenticated else []
-    return render_template("votacoes/lista.html", publicas=publicas, minhas=minhas)
+    return render_template("votacoes/lista.html", disponiveis=disponiveis, minhas=minhas)
 
 
 # ---------------------------------------------------------------------------
@@ -165,8 +165,10 @@ def votar(vid: str):
         flash("Votação não encontrada.", "danger")
         return redirect(url_for("votacoes.lista"))
 
-    # Verifica senha antes de qualquer coisa, se não estiver logado
-    if votacao.get("senha") and not current_user.is_authenticated:
+    # Verifica senha antes de qualquer coisa, exceto se for o criador
+    is_criador = (current_user.is_authenticated and
+                  str(votacao.get("criador_id")) == current_user.id)
+    if votacao.get("senha") and not is_criador:
         if session.get(f"acesso_votacao_{vid}") != "ok":
             return redirect(url_for("votacoes.entrar", vid=vid))
 
